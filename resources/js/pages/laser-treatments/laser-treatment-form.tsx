@@ -1,7 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 
 import { index as indexCustomers, show as showCustomers } from '@/routes/customers';
-import { create } from '@/routes/customers/laser_treatments';
 
 import { type BreadcrumbItem } from '@/types';
 import { Head, Form } from '@inertiajs/react';

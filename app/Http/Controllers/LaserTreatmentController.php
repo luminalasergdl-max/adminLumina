@@ -111,6 +111,8 @@ class LaserTreatmentController extends Controller
         }
 
         $laserTreatment->update($request->all());
+
+        return to_route('customers.laser_treatments.show', parameters: [$customer, $laserTreatment]);
     }
 
     /**

@@ -34,13 +34,9 @@ type LaserSessionFormProps = {
 }
 
 export default function LaserSessionForm({ customer, laser_treatment, laser_session }: LaserSessionFormProps) {
-
-    console.log(customer)
-    console.log(laser_treatment)
-
     const title = laser_session ? 'Editar Sesión' : 'Nueva Sesión'
     const action = laser_session
-        ? `/customers/${customer.id}/laser_treatments/${laser_treatment.id}/laser_session/${laser_session.id}`
+        ? `/customers/${customer.id}/laser_treatments/${laser_treatment.id}/laser_sessions/${laser_session.id}`
         : `/customers/${customer.id}/laser_treatments/${laser_treatment.id}/laser_sessions`
     const method = laser_session ? "put" : "post"
     const photoFields = [0, 1, 2]
@@ -104,7 +100,7 @@ export default function LaserSessionForm({ customer, laser_treatment, laser_sess
                                             <FieldLabel>
                                                 Fecha y hora
                                             </FieldLabel>
-                                            <Input type="datetime-local" name="date_hour" />
+                                            <Input type="datetime-local" name="date_hour" defaultValue={laser_session?.date_hour?.slice(0,-8)}/>
                                         </Field>
                                         <Field>
                                             <FieldLabel>

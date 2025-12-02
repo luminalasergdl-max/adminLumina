@@ -36,8 +36,6 @@ class LaserSessionController extends Controller
         $laserSession->fill($request->input());
 
         if ($request->hasFile('photo')) {
-            Log::info('photo');
-
             $uploadPath = "uploads/customers/customer_{$customer->id}";
 
             File::ensureDirectoryExists($uploadPath);
@@ -69,7 +67,7 @@ class LaserSessionController extends Controller
             'customer' => $customer,
             'laser_treatment' => $laserTreatment,
             'laser_session' => $laserSession,
-            'session_index'=> $session_index,
+            'session_index' => $session_index,
         ]);
     }
 
@@ -78,17 +76,22 @@ class LaserSessionController extends Controller
      */
     public function edit(Customer $customer, LaserTreatment $laserTreatment, LaserSession $laserSession)
     {
-        Log::info($customer);
-        Log::info($laserTreatment);
-        Log::info($laserSession);
+        return Inertia::render('laser-sessions/laser-session-form', [
+            'customer' => $customer,
+            'laser_treatment' => $laserTreatment,
+            'laser_session' => $laserSession
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Customer $customer, LaserTreatment $laserTreatment, LaserSession $laserSession, Request $request)
     {
-        //
+        $laserSession = LaserSession::findOrFail($laserSession->id);
+        $laserSession->update($request->all());
+
+        return to_route('customers.laser_treatments.laser_sessions.show', parameters: [$customer, $laserTreatment, $laserSession]);
     }
 
     /**

@@ -75,10 +75,6 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
 
     let imagesList = generateImages(laser_treatment, 'Foto Inicial')
 
-    console.log(imagesList)
-
-    console.log()
-
     imagesList.push(...laser_treatment.laser_sessions?.map((session, index) => generateImages(session, `Foto de sesión ${index + 1}: `)).flat())
 
     return (
