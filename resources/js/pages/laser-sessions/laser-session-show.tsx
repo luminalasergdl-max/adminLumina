@@ -112,9 +112,9 @@ export default function LaserSessionShow({ customer, laser_treatment, laser_sess
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>
-                                            <AlertDialogTitle>Confirmas que deseas borrar este tratamiento?</AlertDialogTitle>
+                                            <AlertDialogTitle>Confirmas que deseas borrar esta sesión?</AlertDialogTitle>
                                             <AlertDialogDescription>
-                                                Esta acción eliminará todas las sesiones e imagenes relacionadas a este tratamiento y no puede ser deshecha...
+                                                Esta acción eliminará la sesión e imagenes relacionadas y no puede ser deshecha...
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>

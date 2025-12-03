@@ -97,8 +97,19 @@ class LaserSessionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Customer $customer, LaserTreatment $laserTreatment, LaserSession $laserSession)
     {
-        //
+        $laserSession = LaserSession::findOrFail($laserSession->id);
+
+        foreach (range(0, 2) as $index) {
+            $photoField = "photo_{$index}";
+
+            if ($laserSession->$photoField && Storage::disk('public')->exists($laserSession->$photoField)) {
+                Storage::disk('public')->delete($laserSession->$photoField);
+            }
+        }
+        $laserSession->delete();
+
+        return to_route('customers.laser_treatments.show', parameters: [$customer, $laserTreatment]);
     }
 }
