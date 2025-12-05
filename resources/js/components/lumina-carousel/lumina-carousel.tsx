@@ -43,22 +43,19 @@ export function LuminaCarousel({ imagesList }: CarouselProps) {
                 imagesList.length
                     ? (
                         <>
-
                             <div className="text-muted-foreground py-2 text-center text-xl">
                                 {current}
                             </div>
-                            <div className="flex justify-center">
+                            <div className="flex justify-center px-6 md:px-1">
                                 <Carousel className="w-full max-w-xl" setApi={setApi}>
                                     <CarouselContent>
                                         {imagesList.map((session, index) => (
                                             <CarouselItem key={index}>
-                                                <div className="p-1">
                                                     <Card>
                                                         <CardContent className="flex aspect-square items-center justify-center p-6">
-                                                            <img src={asset(session.url)} className="w-60 object-contain" />
+                                                            <img src={asset(session.url)} className="w-60 md:w-full object-contain" />
                                                         </CardContent>
                                                     </Card>
-                                                </div>
                                             </CarouselItem>
                                         ))}
                                     </CarouselContent>

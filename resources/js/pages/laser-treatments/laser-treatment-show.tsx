@@ -185,7 +185,7 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
                 />
             </div>
             <div className='m-8'>
-                <div className="flex justify-between  gap-16 sm:gap-2">
+                <div className="flex justify-between gap-16 sm:gap-2">
                     <h2 className='text-xl md:text-3xl font-semibold'>
                         Galería
                     </h2>

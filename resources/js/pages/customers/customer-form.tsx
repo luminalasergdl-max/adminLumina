@@ -69,7 +69,6 @@ export default function CustomerForm
     const handleSuccess = () => {
         const action = customer ? 'editado' : 'creado'
         alert(`Cliente ${action} con éxito!`)
-
     }
 
     return (

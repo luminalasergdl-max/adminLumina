@@ -8,6 +8,8 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LaserTreatmentController;
 use App\Http\Controllers\LaserSessionController;
 
+use App\Http\Controllers\Report\ReportsController;
+
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
@@ -15,12 +17,10 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('dashboard', function () {
-         return redirect('/customers');
+        return redirect('/customers');
     })->name('dashboard');
 
-    Route::get('reports', function () {
-        return Inertia::render('reports');
-    })->name('reports');
+    Route::get('reports', [ReportsController::class, 'show']);
 
     Route::resource('customers', CustomerController::class);
 
