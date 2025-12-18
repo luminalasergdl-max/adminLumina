@@ -100,3 +100,7 @@ CREATE TABLE `laser_session` (
 );
 
 ALTER TABLE `laser_session` ADD CONSTRAINT `laser_treatment_laser_sessions` FOREIGN KEY (`laser_treatment_id`) REFERENCES `laser_treatment` (`id`) ON DELETE CASCADE;
+
+INSERT INTO laser_category (`name`) 
+VALUES 
+  ('Manchas');

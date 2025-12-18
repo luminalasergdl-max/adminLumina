@@ -106,7 +106,7 @@ export default function LaserSessionForm({ customer, laser_treatment, laser_sess
                                             <FieldLabel>
                                                 Precio
                                             </FieldLabel>
-                                            <Input type="text" name="price" defaultValue={laser_session?.price} />
+                                            <Input type="number" name="price" defaultValue={laser_session?.price} />
                                         </Field>
                                         <Field>
                                             <FieldLabel>
