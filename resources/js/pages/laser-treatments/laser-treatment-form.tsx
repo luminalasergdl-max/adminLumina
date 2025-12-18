@@ -88,7 +88,6 @@ export default function LaserTreatmentForm({ customer, laser_treatment, laser_ca
                                             </FieldLabel>
                                             <Select
                                                 defaultValue={laser_treatment?.laser_category_id.toString()}
-                                                value={laser_treatment?.laser_category_id.toString()}
                                                 name="laser_category_id"
                                             >
                                                 <SelectTrigger className="w-[180px]">
