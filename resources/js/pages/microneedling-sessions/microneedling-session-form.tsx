@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 
-import { index as indexCustomers, show as showCustomers } from '@/routes/customers';
-import { show as showLaserTreatments } from '@/routes/customers/laser_treatments';
+import { index as indexCustomers, show as showCustomers } from '@/routes/customers'
+import { show as showMicroneedlingTreatments } from '@/routes/customers/microneedling_treatments';
 
 import { type BreadcrumbItem } from '@/types';
 import { Head, Form } from '@inertiajs/react';
@@ -24,21 +24,21 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { ExtendedCustomer } from '@/types/customer';
-import { LaserTreatment } from '@/types/laser-treatment';
-import { LaserSession } from '@/types/laser-session';
+import { MicroneedlingTreatment } from '@/types/microneedling-treatment';
+import { MicroneedlingSession } from '@/types/microneedling-session';
 
-type LaserSessionFormProps = {
+type MicroneedlingSessionFormProps = {
     customer: ExtendedCustomer
-    laser_treatment: LaserTreatment
-    laser_session?: LaserSession
+    microneedling_treatment: MicroneedlingTreatment
+    microneedling_session?: MicroneedlingSession
 }
 
-export default function LaserSessionForm({ customer, laser_treatment, laser_session }: LaserSessionFormProps) {
-    const title = (laser_session ? 'Editar' : 'Nueva') + ' Sesión'
-    const action = laser_session
-        ? `/customers/${customer.id}/laser_treatments/${laser_treatment.id}/laser_sessions/${laser_session.id}`
-        : `/customers/${customer.id}/laser_treatments/${laser_treatment.id}/laser_sessions`
-    const method = laser_session ? "put" : "post"
+export default function MicroneedlingSessionForm({ customer, microneedling_treatment, microneedling_session }: MicroneedlingSessionFormProps) {
+    const title = (microneedling_session ? 'Editar' : 'Nueva') + ' Sesión'
+    const action = microneedling_session
+        ? `/customers/${customer.id}/microneedling_treatments/${microneedling_treatment.id}/microneedling_sessions/${microneedling_session.id}`
+        : `/customers/${customer.id}/microneedling_treatments/${microneedling_treatment.id}/microneedling_sessions`
+    const method = microneedling_session ? "put" : "post"
     const photoFields = [0, 1, 2]
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -51,23 +51,24 @@ export default function LaserSessionForm({ customer, laser_treatment, laser_sess
             href: showCustomers(customer.id).url,
         },
         {
-            title: laser_treatment.brief_description,
-            href: showLaserTreatments([customer.id, laser_treatment.id]).url
+            title: microneedling_treatment.objective,
+            href: showMicroneedlingTreatments([customer.id, microneedling_treatment.id]).url
         },
         {
             title,
             href: ''
         },
-    ];
+    ]
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={title} />
             <Form action={action} method={method} encType='multipart/form-data'>
                 {({
-                    errors, }) => (
+                    errors
+                }) => (
                     <>
-                        <Card className="m-8">
+                        <Card className='m-8'>
                             <CardHeader>
                                 <CardTitle>
                                     Datos de sesión
@@ -78,48 +79,42 @@ export default function LaserSessionForm({ customer, laser_treatment, laser_sess
                                     <FieldGroup>
                                         <Field>
                                             <FieldLabel>
-                                                Potencia
+                                                Activo usado
                                             </FieldLabel>
-                                            <Input type="text" name="power" defaultValue={laser_session?.power} />
+                                            <Input type="text" name="activo" defaultValue={microneedling_session?.activo} />
                                         </Field>
                                         <Field>
                                             <FieldLabel>
-                                                Cabezal
+                                                Agujas
                                             </FieldLabel>
-                                            <Input type="text" name="header" defaultValue={laser_session?.header} />
+                                            <Input type="text" name="agujas" defaultValue={microneedling_session?.agujas} />
                                         </Field>
                                         <Field>
                                             <FieldLabel>
-                                                Pasadas
+                                                Fecha y hora
                                             </FieldLabel>
-                                            <Input type="text" name="passes" defaultValue={laser_session?.passes} />
+                                            <Input type="datetime-local" name="date_hour" defaultValue={microneedling_session?.date_hour?.slice(0, -8)} />
                                         </Field>
                                     </FieldGroup>
                                     <FieldGroup>
                                         <Field>
                                             <FieldLabel>
-                                                Fecha y hora
-                                            </FieldLabel>
-                                            <Input type="datetime-local" name="date_hour" defaultValue={laser_session?.date_hour?.slice(0,-8)}/>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>
                                                 Precio
                                             </FieldLabel>
-                                            <Input type="number" name="price" defaultValue={laser_session?.price} />
+                                            <Input type="number" name="price" defaultValue={microneedling_session?.price} />
                                         </Field>
                                         <Field>
                                             <FieldLabel>
                                                 Notas (Observaciones)
                                             </FieldLabel>
-                                            <Textarea name="notes" defaultValue={laser_session?.notes} />
+                                            <Textarea name="notes" defaultValue={microneedling_session?.notes} />
                                         </Field>
                                     </FieldGroup>
                                 </div>
                             </CardContent>
                         </Card>
                         <Card className="m-8">
-                            {laser_session ?
+                            {microneedling_session ?
                                 (
                                     <>
                                         <CardHeader>

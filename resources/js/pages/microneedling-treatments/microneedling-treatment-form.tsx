@@ -1,9 +1,12 @@
-import AppLayout from '@/layouts/app-layout';
+import AppLayout from "@/layouts/app-layout";
 
 import { index as indexCustomers, show as showCustomers } from '@/routes/customers';
 
 import { type BreadcrumbItem } from '@/types';
 import { Head, Form } from '@inertiajs/react';
+
+import { ExtendedCustomer } from '@/types/customer';
+import { MicroneedlingTreatment } from "@/types/microneedling-treatment"
 
 import {
     Button
@@ -12,6 +15,8 @@ import {
 import {
     Input
 } from "@/components/ui/input"
+
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
 
 import {
     Field,
@@ -22,33 +27,19 @@ import {
 
 import { Checkbox } from "@/components/ui/checkbox"
 
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-
 import { Textarea } from "@/components/ui/textarea"
 
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
-import { ExtendedCustomer } from '@/types/customer';
-import { LaserTreatment } from '@/types/laser-treatment';
-import { LaserCategory } from '@/types/laser-category';
-
-type LaserTreatmentFormProps = {
+type MicroneedlingTreatmentFormProps = {
     customer: ExtendedCustomer
-    laser_categories: LaserCategory[]
-    laser_treatment?: LaserTreatment
+    microneedling_treatment?: MicroneedlingTreatment
 }
 
-export default function LaserTreatmentForm({ customer, laser_treatment, laser_categories }: LaserTreatmentFormProps) {
-    const title = (laser_treatment ? 'Editar' : 'Nuevo') + ' Tratamiento (LASER)'
-    const action = laser_treatment
-        ? `/customers/${customer.id}/laser_treatments/${laser_treatment.id}`
-        : `/customers/${customer.id}/laser_treatments`
-    const method = laser_treatment ? "PUT" : "POST"
+export default function MicroneedlingTreatmentForm({ customer, microneedling_treatment }: MicroneedlingTreatmentFormProps) {
+    const title = (microneedling_treatment ? 'Editar' : 'Nuevo') + ' Tratamiento (MICRONEEDLING)'
+    const action = microneedling_treatment
+        ? `/customers/${customer.id}/microneedling_treatments/${microneedling_treatment.id}`
+        : `/customers/${customer.id}/microneedling_treatments`
+    const method = microneedling_treatment ? "PUT" : "POST"
     const photoFields = [0, 1, 2]
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -70,13 +61,12 @@ export default function LaserTreatmentForm({ customer, laser_treatment, laser_ca
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={title} />
             <Form action={action} method={method} encType='multipart/form-data'>
-                {({
-                    errors, }) => (
+                {({ errors }) => (
                     <>
-                        <Card className="m-8">
+                        <Card className='m-8'>
                             <CardHeader>
                                 <CardTitle>
-                                    Tratamiento Láser
+                                    Microneedling
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
@@ -84,63 +74,30 @@ export default function LaserTreatmentForm({ customer, laser_treatment, laser_ca
                                     <FieldGroup>
                                         <Field>
                                             <FieldLabel>
-                                                Categoría *
+                                                Objetivo *
                                             </FieldLabel>
-                                            <Select
-                                                defaultValue={laser_treatment?.laser_category_id.toString()}
-                                                name="laser_category_id"
-                                            >
-                                                <SelectTrigger className="w-[180px]">
-                                                    <SelectValue placeholder="Selecciona una categoría" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {laser_categories.map((category) => (
-                                                        <SelectItem key={category.id} value={String(category.id)}>{category.name}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.laser_category_id && <FieldError>Categoría obligatoria</FieldError>}
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>
-                                                Descripción breve *
-                                            </FieldLabel>
-                                            <Input type="text" name="brief_description" defaultValue={laser_treatment?.brief_description} />
-                                            {errors.brief_description && <FieldError>Descripción breve obligatoria</FieldError>}
+                                            <Input type="text" name="objective" defaultValue={microneedling_treatment?.objective} />
+                                            {errors.objective && <FieldError>Objetivo obligatorio</FieldError>}
                                         </Field>
                                         <Field>
                                             <FieldLabel>
                                                 Lugar anatómico
                                             </FieldLabel>
-                                            <Input type="text" name="anatomic_place" defaultValue={laser_treatment?.anatomic_place} />
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>
-                                                Tamaño
-                                            </FieldLabel>
-                                            <Input type="text" name="size" defaultValue={laser_treatment?.size} />
+                                            <Input type="text" name="anatomic_place" defaultValue={microneedling_treatment?.anatomic_place} />
                                         </Field>
                                     </FieldGroup>
                                     <FieldGroup>
                                         <Field>
                                             <FieldLabel>
-                                                Antigüedad (en años)
+                                                Activo
                                             </FieldLabel>
-                                            <Input type="number" name="years" defaultValue={laser_treatment?.years} />
-                                            {errors.years && <FieldError>Máximo 2 digitos</FieldError>}
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>
-                                                Número de retoques
-                                            </FieldLabel>
-                                            <Input type="number" name="retouching" defaultValue={laser_treatment?.retouching} />
-                                            {errors.retouching && <FieldError>Máximo 2 digitos</FieldError>}
+                                            <Input type="text" name="activo" defaultValue={microneedling_treatment?.activo} />
                                         </Field>
                                         <Field>
                                             <FieldLabel>
                                                 Notas (Observaciones)
                                             </FieldLabel>
-                                            <Textarea name="notes" defaultValue={laser_treatment?.notes} />
+                                            <Textarea name="notes" defaultValue={microneedling_treatment?.notes} />
                                         </Field>
                                     </FieldGroup>
                                 </div>
@@ -158,7 +115,7 @@ export default function LaserTreatmentForm({ customer, laser_treatment, laser_ca
                                                 id="laser"
                                                 name="laser"
                                                 value="1"
-                                                defaultChecked={laser_treatment?.laser}
+                                                defaultChecked={microneedling_treatment?.laser}
                                             />
                                             <FieldLabel
                                                 htmlFor="laser"
@@ -171,7 +128,7 @@ export default function LaserTreatmentForm({ customer, laser_treatment, laser_ca
                                                 id="surgery"
                                                 name="surgery"
                                                 value="1"
-                                                defaultChecked={laser_treatment?.surgery}
+                                                defaultChecked={microneedling_treatment?.surgery}
                                             />
                                             <FieldLabel
                                                 htmlFor="surgery"
@@ -186,7 +143,7 @@ export default function LaserTreatmentForm({ customer, laser_treatment, laser_ca
                                                 id="acid"
                                                 name="acid"
                                                 value="1"
-                                                defaultChecked={laser_treatment?.acid}
+                                                defaultChecked={microneedling_treatment?.acid}
                                             />
                                             <FieldLabel
                                                 htmlFor="acid"
@@ -198,14 +155,14 @@ export default function LaserTreatmentForm({ customer, laser_treatment, laser_ca
                                             <FieldLabel>
                                                 Otro
                                             </FieldLabel>
-                                            <Input type="text" name="other" defaultValue={laser_treatment?.other} />
+                                            <Input type="text" name="other" defaultValue={microneedling_treatment?.other} />
                                         </Field>
                                     </FieldGroup>
                                 </div>
                             </CardContent>
                         </Card>
                         <Card className="m-8">
-                            {laser_treatment ?
+                            {microneedling_treatment ?
                                 (
                                     <>
                                         <CardHeader>

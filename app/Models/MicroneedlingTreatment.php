@@ -17,6 +17,10 @@ class MicroneedlingTreatment extends Model
         'objective',
         'anatomic_place',
         'previous_sessions',
+        'laser',
+        'surgery',
+        'acid',
+        'other',
         'activo',
         'notes',
         'photo_1',
@@ -25,7 +29,10 @@ class MicroneedlingTreatment extends Model
     ];
 
     protected $casts = [
-        'previous_sessions' => 'integer'
+        'previous_sessions' => 'integer',
+        'laser' => 'boolean',
+        'surgery' => 'boolean',
+        'acid' => 'boolean',
     ];
 
     /**
@@ -37,7 +44,7 @@ class MicroneedlingTreatment extends Model
     }
 
     /**
-     * @return HasMany<LaserSession>
+     * @return HasMany<MicroneedlingSession>
      */
     public function microneedlingSessions(): HasMany
     {

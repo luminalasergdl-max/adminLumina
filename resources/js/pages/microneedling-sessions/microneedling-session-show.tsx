@@ -13,14 +13,14 @@ import {
 } from "@/components/ui/item"
 
 import { index as indexCustomers, show as showCustomers } from '@/routes/customers';
-import { show as showLaserTreatment } from '@/routes/customers/laser_treatments';
-import { show, destroy } from '@/routes/customers/laser_treatments/laser_sessions'
+import { show as showMicroneedlingTreatment } from '@/routes/customers/microneedling_treatments';
+import { show, destroy } from '@/routes/customers/microneedling_treatments/microneedling_sessions'
 
 import { type BreadcrumbItem } from '@/types';
 
 import { ExtendedCustomer } from '@/types/customer';
-import { LaserSession } from '@/types/laser-session'
-import { LaserTreatment } from '@/types/laser-treatment'
+import { MicroneedlingSession } from '@/types/microneedling-session'
+import { MicroneedlingTreatment } from '@/types/microneedling-treatment'
 
 import { Trash2Icon, PencilIcon } from "lucide-react"
 
@@ -46,14 +46,14 @@ import {
 
 import { LuminaCarousel, CarouselElement } from '@/components/lumina-carousel/lumina-carousel';
 
-type LaserSessionShowProps = {
+type MicroneedlingSessionShowProps = {
     customer: ExtendedCustomer
-    laser_session: LaserSession
-    laser_treatment: LaserTreatment
+    microneedling_session: MicroneedlingSession
+    microneedling_treatment: MicroneedlingTreatment
     session_index: number
 }
 
-export default function LaserSessionShow({ customer, laser_treatment, laser_session, session_index }: LaserSessionShowProps) {
+export default function MicroneedlingSessionShow({ customer, microneedling_treatment, microneedling_session, session_index }: MicroneedlingSessionShowProps) {
     const title = `Sesión ${session_index}`
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -66,31 +66,31 @@ export default function LaserSessionShow({ customer, laser_treatment, laser_sess
             href: showCustomers(customer.id).url,
         },
         {
-            title: laser_treatment.brief_description,
-            href: showLaserTreatment({ customer: customer.id, laser_treatment: laser_treatment.id }).url
+            title: microneedling_treatment.objective,
+            href: showMicroneedlingTreatment({ customer: customer.id, microneedling_treatment: microneedling_treatment.id }).url
         },
         {
             title,
-            href: showLaserTreatment({ customer: customer.id, laser_treatment: laser_treatment.id }).url
+            href: showMicroneedlingTreatment({ customer: customer.id, microneedling_treatment: microneedling_treatment.id }).url
         },
     ];
 
 
     const imagesList = [0, 1, 2].reduce((prevArray, index) => {
         // @ts-expect-error
-        const photoField: keyof typeof laser_session = `photo_${index}`
-        if (laser_session[photoField]) {
+        const photoField: keyof typeof microneedling_session = `photo_${index}`
+        if (microneedling_session[photoField]) {
             prevArray.push(
                 {
                     description: `Foto ${index + 1}`,
                     // @ts-expect-error
-                    url: laser_session[photoField]
+                    url: microneedling_session[photoField]
                 })
         }
         return prevArray
     }, [] as CarouselElement[])
 
-    const dateHour = laser_session.date_hour ? format(new Date(laser_session.date_hour.slice(0, -1)), 'dd/MM/yyyy, HH:mm') : null
+    const dateHour = microneedling_session.date_hour ? format(new Date(microneedling_session.date_hour.slice(0, -1)), 'dd/MM/yyyy, HH:mm') : null
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -104,7 +104,7 @@ export default function LaserSessionShow({ customer, laser_treatment, laser_sess
                             </h2>
                             <ButtonGroup>
                                 <Button variant="outline" size="icon" asChild>
-                                    <Link href={`/customers/${customer.id}/laser_treatments/${laser_treatment.id}/laser_sessions/${laser_session.id}/edit`}><PencilIcon /></Link>
+                                    <Link href={`/customers/${customer.id}/microneedling_treatments/${microneedling_treatment.id}/microneedling_sessions/${microneedling_session.id}/edit`}><PencilIcon /></Link>
                                 </Button>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
@@ -120,7 +120,7 @@ export default function LaserSessionShow({ customer, laser_treatment, laser_sess
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                             <AlertDialogAction asChild>
-                                                <Link href={destroy({ customer: customer.id, laser_treatment: laser_treatment.id, laser_session: laser_session.id })}>Sí, borrar</Link>
+                                                <Link href={destroy({ customer: customer.id, microneedling_treatment: microneedling_treatment.id, microneedling_session: microneedling_session.id })}>Sí, borrar</Link>
                                             </AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
@@ -130,26 +130,18 @@ export default function LaserSessionShow({ customer, laser_treatment, laser_sess
                         <div className="grid grid-cols-1 md:grid-cols-2">
                             <div>
                                 <ItemTitle className='mt-4'>
-                                    Potencia
+                                    Activo
                                 </ItemTitle>
                                 <ItemDescription>
-                                    {laser_session.power || '-'}
+                                    {microneedling_session.activo || '-'}
                                 </ItemDescription>
                             </div>
                             <div>
                                 <ItemTitle className='mt-4'>
-                                    Cabezal
+                                    Agujas
                                 </ItemTitle>
                                 <ItemDescription>
-                                    {laser_session.header || '-'}
-                                </ItemDescription>
-                            </div>
-                            <div>
-                                <ItemTitle className='mt-4'>
-                                    Pasadas
-                                </ItemTitle>
-                                <ItemDescription>
-                                    {laser_session.passes || '-'}
+                                    {microneedling_session.agujas || '-'}
                                 </ItemDescription>
                             </div>
                             <div>
@@ -157,7 +149,7 @@ export default function LaserSessionShow({ customer, laser_treatment, laser_sess
                                     Precio
                                 </ItemTitle>
                                 <ItemDescription>
-                                    {laser_session.price || '-'}
+                                    {microneedling_session.price || '-'}
                                 </ItemDescription>
                             </div>
                             <div>
@@ -173,7 +165,7 @@ export default function LaserSessionShow({ customer, laser_treatment, laser_sess
                                     Notas
                                 </ItemTitle>
                                 <ItemDescription className='line-clamp-none'>
-                                    {laser_session.notes || '-'}
+                                    {microneedling_session.notes || '-'}
                                 </ItemDescription>
                             </div>
                         </div>

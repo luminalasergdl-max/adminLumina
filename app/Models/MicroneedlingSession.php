@@ -30,7 +30,7 @@ class MicroneedlingSession extends Model
     ];
 
     /**
-     * @return BelongsTo<MicroneedlingTreatment, LaserSession>
+     * @return BelongsTo<MicroneedlingTreatment, MicroneedlingSession>
      */
     public function microneedlingTreatment(): BelongsTo
     {

@@ -1,4 +1,5 @@
 import { LaserTreatment } from './laser-treatment'
+import { MicroneedlingTreatment } from './microneedling-treatment'
 
 export type Customer = {
     id: number,
@@ -37,6 +38,7 @@ export type Customer = {
     drinks: boolean
     frequent_solar_exposure: boolean
     laser_treatments: LaserTreatment[]
+    microneedling_treatments: MicroneedlingTreatment[]
 }
 
 export interface ExtendedCustomer extends Customer {
