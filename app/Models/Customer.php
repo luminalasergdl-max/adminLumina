@@ -83,4 +83,12 @@ class Customer extends Model
     {
         return $this->hasMany(LaserTreatment::class);
     }
+
+    /**
+     * @return HasMany<MicroneedlingTreatment>
+     */
+    public function microneedlingTreatments(): HasMany
+    {
+        return $this->hasMany(MicroneedlingTreatment::class);
+    }
 }

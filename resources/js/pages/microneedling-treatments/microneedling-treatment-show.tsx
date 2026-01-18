@@ -10,19 +10,6 @@ import {
     ItemTitle,
 } from "@/components/ui/item"
 
-import { index as indexCustomers, show as showCustomers } from '@/routes/customers';
-import { show, destroy } from '@/routes/customers/laser_treatments';
-
-import { create as createLaserSession } from '@/routes/customers/laser_treatments/laser_sessions'
-
-import { type BreadcrumbItem } from '@/types';
-
-import { ExtendedCustomer } from '@/types/customer';
-import { LaserCategory } from '@/types/laser-category'
-import { LaserTreatment } from '@/types/laser-treatment'
-
-import { Trash2Icon, PencilIcon } from "lucide-react"
-
 import {
     Button
 } from "@/components/ui/button"
@@ -43,20 +30,32 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-import { LuminaCarousel, CarouselElement } from '@/components/lumina-carousel/lumina-carousel';
+import { ExtendedCustomer } from '@/types/customer';
 
-import { LaserTreatmentShowLaserSessionsTable } from './laser-treatment-show-laser-sessions-table'
-import { LaserSession } from '@/types/laser-session';
+import { MicroneedlingTreatment } from '@/types/microneedling-treatment';
 
-type LaserTreatmentShowProps = {
+import { type BreadcrumbItem } from '@/types';
+
+import { Trash2Icon, PencilIcon } from "lucide-react"
+
+type MicroneedlingTreatmentShowProps = {
     customer: ExtendedCustomer
-    laser_categories: LaserCategory[]
-    laser_treatment: LaserTreatment
+    microneedling_treatment: MicroneedlingTreatment
     index: number
 }
 
-export default function LaserTreatmentShow({ customer, laser_treatment, laser_categories, index }: LaserTreatmentShowProps) {
-    const title = laser_treatment.brief_description
+import { index as indexCustomers, show as showCustomers } from '@/routes/customers';
+
+import { create as createMicroneedlingSession } from '@/routes/customers/microneedling_treatments/microneedling_sessions'
+
+import { show, destroy } from '@/routes/customers/microneedling_treatments';
+import { MicroneedlingSession } from '@/types/microneedling-session';
+
+import { LuminaCarousel, CarouselElement } from '@/components/lumina-carousel/lumina-carousel';
+import { MicroneedlingTreatmentShowMicroneedlingSessionsTable } from './microneedling-treatment-show-microneedling-sessions-table';
+
+export default function MicroneedlingTreatmentShow({ customer, microneedling_treatment, index }: MicroneedlingTreatmentShowProps) {
+    const title = microneedling_treatment.objective
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -69,13 +68,13 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
         },
         {
             title,
-            href: show({ customer: customer.id, laser_treatment: laser_treatment.id }).url
+            href: show({ customer: customer.id, microneedling_treatment: microneedling_treatment.id }).url
         },
     ];
 
-    let imagesList = generateImages(laser_treatment, 'Foto Inicial')
+    let imagesList = generateImages(microneedling_treatment, 'Foto Inicial')
 
-    imagesList.push(...laser_treatment.laser_sessions?.map((session, index) => generateImages(session, `Foto de sesión ${index + 1}: `)).flat())
+    imagesList.push(...microneedling_treatment.microneedling_sessions?.map((session, index) => generateImages(session, `Foto de sesión ${index + 1}: `)).flat())
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -85,11 +84,11 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
                     <ItemContent>
                         <div className='flex flex-row justify-between'>
                             <h2 className='text-xl md:text-3xl font-semibold'>
-                                {laser_treatment.brief_description}
+                                {microneedling_treatment.objective}
                             </h2>
                             <ButtonGroup>
                                 <Button variant="outline" size="icon" asChild>
-                                    <Link href={`/customers/${customer.id}/laser_treatments/${laser_treatment.id}/edit`}><PencilIcon /></Link>
+                                    <Link href={`/customers/${customer.id}/microneedling_treatments/${microneedling_treatment.id}/edit`}><PencilIcon /></Link>
                                 </Button>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
@@ -105,7 +104,7 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                             <AlertDialogAction asChild>
-                                                <Link href={destroy({ customer: customer.id, laser_treatment: laser_treatment.id })}>Sí, borrar</Link>
+                                                <Link href={destroy({ customer: customer.id, microneedling_treatment: microneedling_treatment.id })}>Sí, borrar</Link>
                                             </AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
@@ -113,44 +112,20 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
                             </ButtonGroup>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2">
-                            <div>
-                                <ItemTitle className='mt-4'>
-                                    Categoría
-                                </ItemTitle>
-                                <ItemDescription>
-                                    {laser_categories.find((laserCategory) => (laserCategory.id === laser_treatment.laser_category_id))?.name || '-'}
-                                </ItemDescription>
-                            </div>
                             <div className="lg:block">
                                 <ItemTitle className='mt-4'>
                                     Lugar anatómico
                                 </ItemTitle>
                                 <ItemDescription>
-                                    {laser_treatment.anatomic_place || '-'}
+                                    {microneedling_treatment.anatomic_place || '-'}
                                 </ItemDescription>
                             </div>
                             <div className="lg:block">
                                 <ItemTitle className='mt-4'>
-                                    Tamaño
+                                    Activo
                                 </ItemTitle>
                                 <ItemDescription>
-                                    {laser_treatment.size || '-'}
-                                </ItemDescription>
-                            </div>
-                            <div className="lg:block">
-                                <ItemTitle className='mt-4'>
-                                    Antiguëdad (en años)
-                                </ItemTitle>
-                                <ItemDescription>
-                                    {laser_treatment.years || '-'}
-                                </ItemDescription>
-                            </div>
-                            <div className="lg:block">
-                                <ItemTitle className='mt-4'>
-                                    Número de retoques
-                                </ItemTitle>
-                                <ItemDescription>
-                                    {laser_treatment.retouching || '-'}
+                                    {microneedling_treatment.activo || '-'}
                                 </ItemDescription>
                             </div>
                             <div className="lg:block">
@@ -158,7 +133,7 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
                                     Notas
                                 </ItemTitle>
                                 <ItemDescription className='line-clamp-none'>
-                                    {laser_treatment.notes || '-'}
+                                    {microneedling_treatment.notes || '-'}
                                 </ItemDescription>
                             </div>
                         </div>
@@ -170,18 +145,19 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
                     <h2 className='text-xl md:text-3xl font-semibold'>
                         Sesiones
                     </h2>
+
                     <Link
-                        href={createLaserSession([customer, laser_treatment.id]).url}
-                        method={createLaserSession([customer.id, laser_treatment.id]).method}
+                        href={createMicroneedlingSession([customer, microneedling_treatment.id]).url}
+                        method={createMicroneedlingSession([customer.id, microneedling_treatment.id]).method}
                         as="button"
                         className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3"
                     >
                         Nueva Sesión
                     </Link>
                 </div>
-                <LaserTreatmentShowLaserSessionsTable
+                <MicroneedlingTreatmentShowMicroneedlingSessionsTable
                     customer={customer}
-                    laserTreatment={laser_treatment}
+                    microneedlingTreatment={microneedling_treatment}
                 />
             </div>
             <div className='m-8'>
@@ -196,7 +172,8 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
     )
 }
 
-function generateImages(source: LaserTreatment | LaserSession, description: string) {
+
+function generateImages(source: MicroneedlingTreatment | MicroneedlingSession, description: string) {
     return [0, 1, 2].reduce((prevArray, index) => {
         // @ts-expect-error
         const photoField: keyof typeof source = `photo_${index}`
