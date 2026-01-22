@@ -54,7 +54,6 @@ type LaserTreatmentShowProps = {
     customer: ExtendedCustomer
     laser_categories: LaserCategory[]
     laser_treatment: LaserTreatment
-    index: number
 }
 
 export default function LaserTreatmentShow({ customer, laser_treatment, laser_categories }: LaserTreatmentShowProps) {
@@ -151,7 +150,7 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
                         </div>
                         {laser_treatment.finished &&
                             (
-                                <div className='flex'>
+                                <div className='flex gap-2'>
                                     <span className='font-extrabold'>
                                         (Tratamiento Finalizado)
                                     </span>
