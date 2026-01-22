@@ -21,7 +21,7 @@ import { ExtendedCustomer } from '@/types/customer';
 import { LaserCategory } from '@/types/laser-category'
 import { LaserTreatment } from '@/types/laser-treatment'
 
-import { Trash2Icon, PencilIcon, CheckIcon, CheckCheckIcon } from "lucide-react"
+import { Trash2Icon, PencilIcon, CheckIcon } from "lucide-react"
 
 import {
     Button
