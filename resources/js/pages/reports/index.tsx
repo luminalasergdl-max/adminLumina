@@ -33,7 +33,6 @@ export default function Reports({ customersByGender, customersByZipCode, current
                     <MonthlyIncome currentMonthIncome={currentMonthIncome} />
                 </div>
             </div>
-
         </AppLayout>
     );
 }

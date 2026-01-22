@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { index } from '@/routes/customers';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, CircleUser, ChartNoAxesCombined } from 'lucide-react';
+import { CircleUser, ChartNoAxesCombined, CreditCard, Tag } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -18,18 +18,15 @@ const mainNavItems: NavItem[] = [
         href: '/reports',
         icon: ChartNoAxesCombined,
     },
-];
-
-const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
+        title: 'Tarjetas de regalo',
+        href: '/gift_card',
+        icon: CreditCard,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Campañas',
+        href: '/gift_card_campaign',
+        icon: Tag,
     },
 ];
 
@@ -53,7 +50,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

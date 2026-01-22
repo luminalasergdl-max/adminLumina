@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 
+use App\Models\GiftCard;
 use Inertia\Inertia;
 
 use App\Models\Customer;
@@ -48,6 +49,10 @@ class ReportsController extends Controller
             ->whereRaw('YEAR(date_hour) = ?', [$year])
             ->sum('price');
 
-        return $laserSessionsTotal + $microneedlingSessionsTotal;
+        $giftcardTotal = GiftCard::whereRaw('MONTH(created_at) = ?', [$month])
+            ->whereRaw('YEAR(created_at) = ?', [$year])
+            ->sum('price');
+
+        return $laserSessionsTotal + $microneedlingSessionsTotal + $giftcardTotal;
     }
 }

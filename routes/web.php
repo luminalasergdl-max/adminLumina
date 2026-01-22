@@ -13,6 +13,9 @@ use App\Http\Controllers\MicroneedlingSessionController;
 
 use App\Http\Controllers\Report\ReportsController;
 
+use App\Http\Controllers\GiftCardCampaignController;
+use App\Http\Controllers\GiftCardController;
+
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
@@ -40,6 +43,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('customers.microneedling_treatments', MicroneedlingTreatmentController::class);
 
     Route::resource('customers.microneedling_treatments.microneedling_sessions', MicroneedlingSessionController::class);
+
+    Route::resource('gift_card_campaign', GiftCardCampaignController::class)->except(['destroy']);
+
+    Route::resource('gift_card', GiftCardController::class);
+
+    Route::patch('markAsUsed/{giftCardId}', [GiftCardController::class, 'markAsUsed']);
 });
 
 require __DIR__ . '/settings.php';
