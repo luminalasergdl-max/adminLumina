@@ -13,8 +13,6 @@ use App\Models\LaserTreatment;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
-use Illuminate\Support\Facades\Log;
-
 class LaserTreatmentController extends Controller
 {
     /**
@@ -140,8 +138,6 @@ class LaserTreatmentController extends Controller
     {
         $laserTreatment = LaserTreatment::findOrFail(id: $id);
         $customer = Customer::findOrFail(id: $customerId);
-
-        Log::info('{request}', ['request' => $request]);
 
         if ($request->only('finished') == true) {
             $laserTreatment->update(['finished' => true]);
