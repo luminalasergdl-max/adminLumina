@@ -1,13 +1,6 @@
-import AppLayout from '@/layouts/app-layout';
-import { index, create } from '@/routes/customers';
+import AppLayout from "@/layouts/app-layout"
+import { index, create, show } from '@/routes/gift_card_campaign';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-
-import { router } from '@inertiajs/react'
-
-import {
-    Input
-} from "@/components/ui/input"
 
 import {
     Button
@@ -23,6 +16,14 @@ import {
 } from "@/components/ui/table"
 
 import {
+    Input
+} from "@/components/ui/input"
+
+import { GiftCardCampaign } from '@/types/gift-card-campaign'
+
+import { Head, Link } from '@inertiajs/react';
+
+import {
     ColumnDef,
     flexRender,
     getCoreRowModel,
@@ -31,40 +32,33 @@ import {
     useReactTable,
 } from "@tanstack/react-table"
 
-import {
-    ExtendedCustomer
-} from '@/types/customer'
+import { router } from '@inertiajs/react'
+
+type GiftCardCampaignsListProps = {
+    giftCardCampaigns: GiftCardCampaign[]
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Clientes',
+        title: 'Campañas',
         href: index().url,
-    },
-];
-
-export const columns: ColumnDef<ExtendedCustomer>[] = [
-    {
-        accessorKey: "full_name",
-        header: "Nombre",
-    },
-    {
-        accessorKey: "email",
-        header: "Email",
-    },
-    {
-        accessorKey: "contact_phone_1",
-        header: "Telefóno de Contacto",
-        cell: ({ row }) => (
-            <a href={`https://wa.me/${row.original.contact_phone_1}`} target='blank' rel="noopener" >
-                {row.original.contact_phone_1}
-            </a>
-        )
     },
 ]
 
-export default function CustomersList({ customers }: { customers: ExtendedCustomer[] }) {
+export const columns: ColumnDef<GiftCardCampaign>[] = [
+    {
+        accessorKey: "campaign_name",
+        header: "Campaña",
+    },
+    {
+        accessorKey: "canva_design_url",
+        header: "URL de Canva",
+    },
+]
+
+export default function GiftCardCampaignsList({ giftCardCampaigns }: GiftCardCampaignsListProps) {
     const table = useReactTable({
-        data: customers,
+        data: giftCardCampaigns,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
@@ -73,11 +67,11 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Clientes" />
+            <Head title="Campañas" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex justify-end gap-16 sm:gap-2">
                     <Input
-                        placeholder="Buscar por nombre, teléfono, email..."
+                        placeholder="Buscar por campaña..."
                         value={table.getState().globalFilter ?? ''}
                         onChange={(e) => table.setGlobalFilter(String(e.target.value))}
                         className="max-w"
@@ -88,7 +82,7 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
                         as="button"
                         className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3"
                     >
-                        Nuevo Cliente
+                        Nueva Campaña
                     </Link>
                 </div>
                 <div className="grid auto-rows-min gap-4 rounded-md border">
@@ -118,7 +112,7 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
                                         className={"cursor-pointer"}
                                         key={row.id}
                                         onClick={() => {
-                                            router.get(`/customers/${row.original.id}`)
+                                            router.get(show(row.original.id).url)
                                         }}
                                     >
                                         {row.getVisibleCells().map((cell) => (
@@ -160,5 +154,5 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
                 </div>
             </div>
         </AppLayout>
-    );
+    )
 }

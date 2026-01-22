@@ -11,9 +11,11 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { index } from '@/routes/customers';
 import { reports } from '@/routes';
+import { index as giftCardIndex } from '@/routes/gift_card';
+import { index as giftCardCampaignIndex } from '@/routes/gift_card_campaign';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Menu, Search, ChartNoAxesCombined } from 'lucide-react';
+import { LayoutGrid, Menu, Search, ChartNoAxesCombined, CreditCard, Tag } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -27,6 +29,16 @@ const mainNavItems: NavItem[] = [
         title: 'Reportes',
         href: reports(),
         icon: ChartNoAxesCombined,
+    },
+    {
+        title: 'Tarjetas de regalo',
+        href: giftCardIndex(),
+        icon: CreditCard,
+    },
+    {
+        title: 'Campañas',
+        href: giftCardCampaignIndex(),
+        icon: Tag,
     },
 ];
 
