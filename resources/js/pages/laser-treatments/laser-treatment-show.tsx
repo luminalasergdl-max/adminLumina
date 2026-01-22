@@ -21,7 +21,7 @@ import { ExtendedCustomer } from '@/types/customer';
 import { LaserCategory } from '@/types/laser-category'
 import { LaserTreatment } from '@/types/laser-treatment'
 
-import { Trash2Icon, PencilIcon } from "lucide-react"
+import { Trash2Icon, PencilIcon, CheckIcon, CheckCheckIcon } from "lucide-react"
 
 import {
     Button
@@ -48,6 +48,8 @@ import { LuminaCarousel, CarouselElement } from '@/components/lumina-carousel/lu
 import { LaserTreatmentShowLaserSessionsTable } from './laser-treatment-show-laser-sessions-table'
 import { LaserSession } from '@/types/laser-session';
 
+import { router } from '@inertiajs/react'
+
 type LaserTreatmentShowProps = {
     customer: ExtendedCustomer
     laser_categories: LaserCategory[]
@@ -55,7 +57,22 @@ type LaserTreatmentShowProps = {
     index: number
 }
 
-export default function LaserTreatmentShow({ customer, laser_treatment, laser_categories, index }: LaserTreatmentShowProps) {
+export default function LaserTreatmentShow({ customer, laser_treatment, laser_categories }: LaserTreatmentShowProps) {
+
+    const markAsFinished = async () => {
+        try {
+            router.patch(`/markAsFinished/${laser_treatment.id}/${customer.id}`, {
+                finished: true,
+            }, {
+                onSuccess: () => {
+                    alert('Tratamiento Finalizado! ')
+                }
+            })
+        } catch (error) {
+
+        }
+    }
+
     const title = laser_treatment.brief_description
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -88,6 +105,26 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
                                 {laser_treatment.brief_description}
                             </h2>
                             <ButtonGroup>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="outline" size="icon"><CheckIcon /></Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Confirmas que deseas finalizar este tratamiento?</AlertDialogTitle>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                            <AlertDialogAction asChild>
+                                                <Button
+                                                    onClick={() => { markAsFinished() }}
+                                                >
+                                                    Sí, finalizar
+                                                </Button>
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                                 <Button variant="outline" size="icon" asChild>
                                     <Link href={`/customers/${customer.id}/laser_treatments/${laser_treatment.id}/edit`}><PencilIcon /></Link>
                                 </Button>
@@ -112,6 +149,16 @@ export default function LaserTreatmentShow({ customer, laser_treatment, laser_ca
                                 </AlertDialog>
                             </ButtonGroup>
                         </div>
+                        {laser_treatment.finished &&
+                            (
+                                <div className='flex'>
+                                    <span className='font-extrabold'>
+                                        (Tratamiento Finalizado)
+                                    </span>
+                                    <CheckIcon />
+                                </div>
+                            )
+                        }
                         <div className="grid grid-cols-1 md:grid-cols-2">
                             <div>
                                 <ItemTitle className='mt-4'>

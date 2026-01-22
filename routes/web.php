@@ -38,6 +38,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('customers.laser_treatments', LaserTreatmentController::class);
 
+    Route::patch('markAsFinished/{laserTreatmentId}/{customerId}', [LaserTreatmentController::class, 'markAsFinished']);
+
     Route::resource('customers.laser_treatments.laser_sessions', LaserSessionController::class);
 
     Route::resource('customers.microneedling_treatments', MicroneedlingTreatmentController::class);

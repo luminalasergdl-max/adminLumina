@@ -13,6 +13,8 @@ use App\Models\LaserTreatment;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Support\Facades\Log;
+
 class LaserTreatmentController extends Controller
 {
     /**
@@ -132,5 +134,19 @@ class LaserTreatmentController extends Controller
 
         $laserTreatment->delete();
         return to_route('customers.show', [$customer]);
+    }
+
+    public function markAsFinished(Request $request, $id, $customerId)
+    {
+        $laserTreatment = LaserTreatment::findOrFail(id: $id);
+        $customer = Customer::findOrFail(id: $customerId);
+
+        Log::info('{request}', ['request' => $request]);
+
+        if ($request->only('finished') == true) {
+            $laserTreatment->update(['finished' => true]);
+        }
+
+        return to_route('customers.laser_treatments.show', [$customer, $laserTreatment]);
     }
 }

@@ -49,6 +49,11 @@ export function CustomerShowLaserTreatmentsTable({ customer, laserCategories }: 
             accessorKey: "size",
             header: "Tamaño",
         },
+        {
+            accessorKey: "finished",
+            header: "Finalizado?",
+            cell: ({row}) => (row.original.finished ? 'Finalizado' : '-')
+        },
     ]
 
     const data = customer.laser_treatments
