@@ -28,6 +28,7 @@ class LaserTreatment extends Model
         'photo_1',
         'photo_2',
         'photo_3',
+        'finished',
     ];
 
     protected $casts = [
@@ -36,6 +37,7 @@ class LaserTreatment extends Model
         'laser' => 'boolean',
         'surgery' => 'boolean',
         'acid' => 'boolean',
+        'finished' => 'boolean'
     ];
 
     /**

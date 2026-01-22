@@ -17,4 +17,5 @@ export type LaserTreatment = {
     photo_0?: string,
     photo_1?: string,
     photo_2?: string,
+    finished: boolean,
 }
