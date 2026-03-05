@@ -63,4 +63,12 @@ class LaserTreatment extends Model
     {
         return $this->hasMany(LaserSession::class);
     }
+
+    /**
+     * @return HasMany<Package>
+     */
+    public function packages(): HasMany
+    {
+        return $this->hasMany(Package::class);
+    }
 }

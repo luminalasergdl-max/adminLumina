@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 
 import { index as indexCustomers, show as showCustomers } from '@/routes/customers';
@@ -19,6 +20,8 @@ import {
     FieldGroup,
     FieldLabel,
 } from "@/components/ui/field"
+
+import { Checkbox } from "@/components/ui/checkbox"
 
 import { Textarea } from "@/components/ui/textarea"
 
@@ -60,6 +63,16 @@ export default function LaserSessionForm({ customer, laser_treatment, laser_sess
         },
     ];
 
+    const activePackage = laser_treatment.packages?.length > 0
+        ? [...laser_treatment.packages]
+            .sort((a, b) => a.id - b.id)
+            .find((pack) => pack.package_sessions_used < pack.package_sessions_total)
+        : undefined;
+
+    const [isPackageSession, setIsPackageSession] = useState<boolean>(
+        activePackage ? (laser_session ? !!laser_session.package_id : true) : false
+    );
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={title} />
@@ -100,13 +113,30 @@ export default function LaserSessionForm({ customer, laser_treatment, laser_sess
                                             <FieldLabel>
                                                 Fecha y hora
                                             </FieldLabel>
-                                            <Input type="datetime-local" name="date_hour" defaultValue={laser_session?.date_hour?.slice(0,-8)}/>
+                                            <Input type="datetime-local" name="date_hour" defaultValue={laser_session?.date_hour?.slice(0, -8)} />
                                         </Field>
+                                        {activePackage && (
+
+                                            <Field orientation="horizontal" className="flex flex-row">
+                                                <Checkbox
+                                                    name="package_id"
+                                                    value={activePackage.id.toString()}
+                                                    checked={isPackageSession}
+                                                    onCheckedChange={(checked) => setIsPackageSession(checked as boolean)}
+                                                    id="package_id"
+                                                />
+                                                <FieldLabel htmlFor="package_id" className="font-normal cursor-pointer text-sm">
+                                                    ¿Esta sesión es parte del paquete "{activePackage.package_name}"?
+                                                </FieldLabel>
+                                            </Field>
+
+                                        )}
                                         <Field>
                                             <FieldLabel>
                                                 Precio
                                             </FieldLabel>
-                                            <Input type="number" name="price" defaultValue={laser_session?.price} />
+                                            {isPackageSession && <input type="hidden" name="price" value="0" />}
+                                            <Input type="number" name="price" defaultValue={isPackageSession ? 0 : laser_session?.price} disabled={isPackageSession} />
                                         </Field>
                                         <Field>
                                             <FieldLabel>

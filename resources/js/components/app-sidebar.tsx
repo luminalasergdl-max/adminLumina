@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { index } from '@/routes/customers';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { CircleUser, ChartNoAxesCombined, CreditCard, Tag } from 'lucide-react';
+import { CircleUser, ChartNoAxesCombined, CreditCard, Tag, DollarSign } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -17,6 +17,11 @@ const mainNavItems: NavItem[] = [
         title: 'Reportes',
         href: '/reports',
         icon: ChartNoAxesCombined,
+    },
+    {
+        title: 'Finanzas',
+        href: '/finances',
+        icon: DollarSign,
     },
     {
         title: 'Tarjetas de regalo',

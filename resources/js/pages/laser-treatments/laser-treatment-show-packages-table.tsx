@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-
 import {
     Table,
     TableBody,
@@ -21,44 +19,38 @@ import {
 import { router } from '@inertiajs/react'
 
 import { LaserTreatment } from "@/types/laser-treatment"
-import { LaserSession } from "@/types/laser-session"
+import { Package } from "@/types/package"
 
-import { show } from '@/routes/customers/laser_treatments/laser_sessions';
+import { show } from '@/routes/customers/laser_treatments/packages';
 import { ExtendedCustomer } from "@/types/customer"
 
-type LaserTreatmentShowLaserSessionsTableProps = {
+type LaserTreatmentShowPackagesTableProps = {
     customer: ExtendedCustomer
     laserTreatment: LaserTreatment
 }
 
-export function LaserTreatmentShowLaserSessionsTable({ customer, laserTreatment }: LaserTreatmentShowLaserSessionsTableProps) {
-    const columns: ColumnDef<LaserSession>[] = [
+export function LaserTreatmentShowPackagesTable({ customer, laserTreatment }: LaserTreatmentShowPackagesTableProps) {
+    const columns: ColumnDef<Package>[] = [
         {
             accessorKey: "",
-            header: "Sesión",
+            header: "Paquete",
             cell: ({ row }) => (row.index + 1)
         },
         {
-            accessorKey: "power",
-            header: "Potencia",
-
+            accessorKey: "package_name",
+            header: "Nombre",
         },
         {
-            accessorKey: "header",
-            header: "Cabezal",
-        },
-        {
-            accessorKey: "passes",
-            header: "Pasadas",
-        },
-        {
-            accessorKey: "price",
+            accessorKey: "package_price",
             header: "Precio",
         },
         {
-            accessorKey: "date_hour",
-            header: "Fecha y hora",
-            cell: ({ row }) => (row.original.date_hour ? format(new Date(row.original.date_hour.slice(0, -1)), 'dd/MM/yyyy, HH:mm') : '-')
+            accessorKey: "package_sessions_total",
+            header: "Sesiones totales",
+        },
+        {
+            accessorKey: "package_sessions_used",
+            header: "Sesiones usadas",
         },
         {
             accessorKey: "notes",
@@ -66,7 +58,9 @@ export function LaserTreatmentShowLaserSessionsTable({ customer, laserTreatment 
         },
     ]
 
-    const data = laserTreatment.laser_sessions
+    console.log(laserTreatment)
+
+    const data = laserTreatment.packages || []
 
     const table = useReactTable({
         data,
@@ -104,7 +98,7 @@ export function LaserTreatmentShowLaserSessionsTable({ customer, laserTreatment 
                                 className={"cursor-pointer"}
                                 key={row.id}
                                 onClick={() => {
-                                    router.get(show({ customer: customer.id, laser_treatment: laserTreatment.id, laser_session: row.original.id }, { query: { session_index: Number(row.id) + 1 } }))
+                                    router.get(show({ customer: customer.id, laser_treatment: laserTreatment.id, package: row.original.id }, { query: { package_index: Number(row.id) + 1 } }))
                                 }}
                             >
                                 {row.getVisibleCells().map((cell) => (

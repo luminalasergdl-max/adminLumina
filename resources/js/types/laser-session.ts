@@ -10,4 +10,5 @@ export type LaserSession = {
     photo_0: string,
     photo_1: string,
     photo_2: string,
+    package_id?: number,
 }

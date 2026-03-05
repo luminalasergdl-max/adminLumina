@@ -23,6 +23,7 @@ class LaserSession extends Model
         'photo_0',
         'photo_1',
         'photo_2',
+        'package_id',
     ];
 
     protected $casts = [
