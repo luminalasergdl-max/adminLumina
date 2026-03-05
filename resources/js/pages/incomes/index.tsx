@@ -120,10 +120,6 @@ export default function IncomesIndex({ incomes, month, year }: IncomesIndexProps
             }
         },
         {
-            accessorKey: "description",
-            header: "Descripción",
-        },
-        {
             accessorKey: "amount",
             header: "Monto",
             cell: ({ row }) => (
@@ -248,7 +244,7 @@ export default function IncomesIndex({ incomes, month, year }: IncomesIndexProps
                         </TableBody>
                         <TableFooter>
                             <TableRow>
-                                <TableCell colSpan={2} className="text-right font-bold text-lg">
+                                <TableCell colSpan={1} className="text-right font-bold text-lg">
                                     Total
                                 </TableCell>
                                 <TableCell className="font-bold text-lg text-green-600 dark:text-green-400">
