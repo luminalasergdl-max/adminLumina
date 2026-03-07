@@ -70,7 +70,7 @@ class LaserTreatmentController extends Controller
     {
         $laserCategories = LaserCategory::all();
 
-        $fullLaserTreatment = $laserTreatment::with(relations: 'laserSessions')->find($laserTreatment->id);
+        $fullLaserTreatment = $laserTreatment::with(relations: ['laserSessions', 'packages'])->find($laserTreatment->id);
 
         return Inertia::render(component: 'laser-treatments/laser-treatment-show', props: [
             'customer' => $customer,

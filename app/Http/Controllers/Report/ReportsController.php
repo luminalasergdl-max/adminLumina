@@ -11,6 +11,8 @@ use App\Models\Customer;
 
 use App\Models\LaserSession;
 use App\Models\MicroneedlingSession;
+use App\Models\Package;
+use App\Models\LaserTreatment;
 
 use DB;
 
@@ -28,31 +30,60 @@ class ReportsController extends Controller
         return Inertia::render('reports/index', [
             'customersByGender' => $customersByGender,
             'customersByZipCode' => $customersByZipCode,
-            'currentMonthIncome' => ReportsController::getIncomeByPeriod($currentMonth, $currentYear)
+            'newCustomersByPeriod' => self::newCustomersByPeriod($currentMonth, $currentYear),
+            'customersByHowDidYouKnownAboutUs' => self::getCustomersByHowDidYouKnownAboutUs(),
+            'laserTreatmentsByLaserCategory' => self::laserTreatmentsByLaserCategory()
         ]);
     }
 
-    public function incomeByPeriod($month, $year)
+    public function newCustomersByPeriod($month, $year)
     {
-        $total = ReportsController::getIncomeByPeriod($month, $year);
+        $total = Customer::whereRaw('MONTH(created_at) = ?', [$month])
+            ->whereRaw('YEAR(created_at) = ?', [$year])
+            ->count();
 
         return $total;
     }
 
-    private function getIncomeByPeriod($month, $year)
+    public static function getCustomersByHowDidYouKnownAboutUs()
     {
-        $laserSessionsTotal = LaserSession::whereRaw('MONTH(date_hour) = ?', [$month])
-            ->whereRaw('YEAR(date_hour) = ?', [$year])
-            ->sum('price');
+        $totals = Customer::selectRaw('
+                COALESCE(SUM(instagram), 0) as instagram,
+                COALESCE(SUM(maps), 0) as maps,
+                COALESCE(SUM(mouth_mouth), 0) as mouth_mouth,
+                SUM(CASE WHEN other_hear_about_us IS NOT NULL AND other_hear_about_us != "" THEN 1 ELSE 0 END) as other
+            ')->first();
 
-        $microneedlingSessionsTotal = MicroneedlingSession::whereRaw('MONTH(date_hour) = ?', [$month])
-            ->whereRaw('YEAR(date_hour) = ?', [$year])
-            ->sum('price');
+        return [
+            [
+                'how_did_you_known_about_us' => 'Instagram',
+                'total' => (int) $totals->instagram
+            ],
+            [
+                'how_did_you_known_about_us' => 'Maps',
+                'total' => (int) $totals->maps
+            ],
+            [
+                'how_did_you_known_about_us' => 'Boca a boca',
+                'total' => (int) $totals->mouth_mouth
+            ],
+            [
+                'how_did_you_known_about_us' => 'Otro',
+                'total' => (int) $totals->other
+            ]
+        ];
+    }
 
-        $giftcardTotal = GiftCard::whereRaw('MONTH(created_at) = ?', [$month])
-            ->whereRaw('YEAR(created_at) = ?', [$year])
-            ->sum('price');
+    public static function laserTreatmentsByLaserCategory()
+    {
+        $laserTreatmentsByLaserCategory = LaserTreatment::select(
+            DB::raw("COALESCE(laser_category.name, 'Sin Categoría') AS laser_category_name"),
+            DB::raw('COUNT(laser_treatment.id) AS total')
+        )
+        ->leftJoin('laser_category', 'laser_treatment.laser_category_id', '=', 'laser_category.id')
+        ->groupBy('laser_category.name')
+        ->get();
 
-        return $laserSessionsTotal + $microneedlingSessionsTotal + $giftcardTotal;
+        return $laserTreatmentsByLaserCategory;
     }
 }

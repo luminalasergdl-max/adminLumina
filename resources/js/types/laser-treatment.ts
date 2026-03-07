@@ -1,4 +1,5 @@
 import { LaserSession } from "./laser-session"
+import { Package } from "./package"
 
 export type LaserTreatment = {
     id: number,
@@ -14,6 +15,7 @@ export type LaserTreatment = {
     other: string,
     notes: string,
     laser_sessions: LaserSession[],
+    packages: Package[],
     photo_0?: string,
     photo_1?: string,
     photo_2?: string,

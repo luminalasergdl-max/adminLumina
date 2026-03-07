@@ -16,6 +16,11 @@ use App\Http\Controllers\Report\ReportsController;
 use App\Http\Controllers\GiftCardCampaignController;
 use App\Http\Controllers\GiftCardController;
 
+use App\Http\Controllers\PackageController;
+use App\Http\Controllers\OutcomesController;
+use App\Http\Controllers\FinancesController;
+use App\Http\Controllers\IncomesController;
+
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
@@ -34,6 +39,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('incomeByPeriod/{month}/{year}', [ReportsController::class, 'incomeByPeriod']);
 
+    Route::get('newCustomersByPeriod/{month}/{year}', [ReportsController::class, 'newCustomersByPeriod']);
+
     Route::resource('customers', CustomerController::class);
 
     Route::resource('customers.laser_treatments', LaserTreatmentController::class);
@@ -41,6 +48,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('markAsFinished/{laserTreatmentId}/{customerId}', [LaserTreatmentController::class, 'markAsFinished']);
 
     Route::resource('customers.laser_treatments.laser_sessions', LaserSessionController::class);
+
+    Route::resource('customers.laser_treatments.packages', PackageController::class);
 
     Route::resource('customers.microneedling_treatments', MicroneedlingTreatmentController::class);
 
@@ -51,6 +60,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('gift_card', GiftCardController::class);
 
     Route::patch('markAsUsed/{giftCardId}', [GiftCardController::class, 'markAsUsed']);
+
+    Route::resource('outcomes', OutcomesController::class);
+
+    Route::resource('finances', FinancesController::class);
+
+    Route::resource('incomes', IncomesController::class);
 });
 
 require __DIR__ . '/settings.php';

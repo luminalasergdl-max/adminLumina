@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use App\Models\Customer;
 use App\Models\LaserSession;
 use App\Models\LaserTreatment;
+use App\Models\Package;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +24,7 @@ class LaserSessionController extends Controller
     {
         return Inertia::render('laser-sessions/laser-session-form', [
             'customer' => $customer,
-            'laser_treatment' => $laserTreatment
+            'laser_treatment' => $laserTreatment->load('packages')
         ]);
     }
 
@@ -33,7 +34,11 @@ class LaserSessionController extends Controller
     public function store(Customer $customer, LaserTreatment $laserTreatment, Request $request)
     {
         $laserSession = new LaserSession();
-        $laserSession->fill($request->input());
+        $data = $request->all();
+        if (!$request->has('package_id')) {
+            $data['package_id'] = null;
+        }
+        $laserSession->fill($data);
 
         if ($request->hasFile('photo')) {
             $uploadPath = "uploads/customers/customer_{$customer->id}";
@@ -51,6 +56,13 @@ class LaserSessionController extends Controller
         }
 
         $laserTreatment->laserSessions()->save($laserSession);
+
+        if ($laserSession->package_id) {
+            $package = Package::find($laserSession->package_id);
+            if ($package) {
+                $package->increment('package_sessions_used');
+            }
+        }
 
 
         return to_route('customers.laser_treatments.laser_sessions.show', parameters: [$customer, $laserTreatment, $laserSession]);
@@ -89,7 +101,30 @@ class LaserSessionController extends Controller
     public function update(Customer $customer, LaserTreatment $laserTreatment, LaserSession $laserSession, Request $request)
     {
         $laserSession = LaserSession::findOrFail($laserSession->id);
-        $laserSession->update($request->all());
+        $oldPackageId = $laserSession->package_id;
+
+        $data = $request->all();
+        if (!$request->has('package_id')) {
+            $data['package_id'] = null;
+        }
+        $laserSession->update($data);
+
+        $newPackageId = $laserSession->package_id;
+
+        if ($oldPackageId !== $newPackageId) {
+            if ($oldPackageId) {
+                $oldPackage = Package::find($oldPackageId);
+                if ($oldPackage) {
+                    $oldPackage->decrement('package_sessions_used');
+                }
+            }
+            if ($newPackageId) {
+                $newPackage = Package::find($newPackageId);
+                if ($newPackage) {
+                    $newPackage->increment('package_sessions_used');
+                }
+            }
+        }
 
         return to_route('customers.laser_treatments.laser_sessions.show', parameters: [$customer, $laserTreatment, $laserSession]);
     }
@@ -108,6 +143,14 @@ class LaserSessionController extends Controller
                 Storage::disk('public')->delete($laserSession->$photoField);
             }
         }
+
+        if ($laserSession->package_id) {
+            $package = Package::find($laserSession->package_id);
+            if ($package) {
+                $package->decrement('package_sessions_used');
+            }
+        }
+
         $laserSession->delete();
 
         return to_route('customers.laser_treatments.show', parameters: [$customer, $laserTreatment]);

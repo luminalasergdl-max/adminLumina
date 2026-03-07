@@ -10,8 +10,6 @@ import {
 import {
     ChartConfig,
     ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
@@ -54,12 +52,12 @@ export function CustomersByZipCode({ customersByZipCode }: CustomersByZipCodePro
                         data={customersByZipCode}
                         layout="vertical"
                     >
-                        <XAxis type="number" dataKey="total" hide/>
+                        <XAxis type="number" dataKey="total" hide />
                         <YAxis
                             dataKey="zip_code"
                             type="category"
                             tickLine={false}
-                            tickMargin={12}  
+                            tickMargin={12}
                         />
                         <ChartTooltip
                             cursor={false}
