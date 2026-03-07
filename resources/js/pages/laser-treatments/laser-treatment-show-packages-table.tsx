@@ -58,8 +58,6 @@ export function LaserTreatmentShowPackagesTable({ customer, laserTreatment }: La
         },
     ]
 
-    console.log(laserTreatment)
-
     const data = laserTreatment.packages || []
 
     const table = useReactTable({
