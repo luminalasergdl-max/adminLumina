@@ -20,6 +20,9 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\OutcomesController;
 use App\Http\Controllers\FinancesController;
 use App\Http\Controllers\IncomesController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AppointmentController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -66,6 +69,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('finances', FinancesController::class);
 
     Route::resource('incomes', IncomesController::class);
+
+    Route::resource('suppliers', SupplierController::class);
+
+    Route::resource('products', ProductController::class);
+
+    Route::resource('appointments', AppointmentController::class);
+
+    Route::get('pricing-calculator', function () {
+        return Inertia::render('pricing-calculator/index');
+    })->name('pricing-calculator');
+
+    Route::get('calendar', [AppointmentController::class, 'index'])->name('index');
 });
 
 require __DIR__ . '/settings.php';
