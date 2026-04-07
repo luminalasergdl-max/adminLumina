@@ -8,6 +8,7 @@ import { ExtendedCustomer } from "@/types/customer";
 import { CustomerShowDrawer } from "./customer-show-drawer";
 import { CustomerShowLaserTreatmentsTable } from './customer-show-laser-treatments-table';
 import { CustomerShowMicroneedlingTreatmentsTable } from './customer-show-microneedling-treatments-table';
+import { CustomerShowAppointmentsTable } from './customer-show-appointments-table';
 
 import { index, create, destroy } from '@/routes/customers';
 
@@ -188,6 +189,20 @@ export default function CustomerShow({ customer, laser_categories }: { customer:
                 <CustomerShowMicroneedlingTreatmentsTable
                     customer={customer}
                 />
+            </div>
+            <div className='m-8'>
+                <div className="flex justify-between gap-16 sm:gap-2">
+                    <h2 className='text-xl md:text-3xl font-semibold'>
+                        Citas
+                    </h2>
+                    <Link
+                        href="/calendar"
+                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all focus-visible:border-ring focus-visible:ring-ring/50 outline-none  bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+                    >
+                        Ver Calendario
+                    </Link>
+                </div>
+                <CustomerShowAppointmentsTable customer={customer} />
             </div>
         </AppLayout>
     )

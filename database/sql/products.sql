@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS products;
+
+CREATE TABLE products (
+    `id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    `name` VARCHAR(100) NOT NULL,
+    `brand` VARCHAR(100) NOT NULL,
+    `presentation` VARCHAR(50), 
+    `unit_of_measurement` VARCHAR(20),
+    `minimum_stock` INT DEFAULT 5,
+    `notes` TEXT,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

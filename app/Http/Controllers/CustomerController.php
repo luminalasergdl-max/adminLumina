@@ -61,7 +61,7 @@ class CustomerController extends Controller
      */
     public function show(string $id)
     {
-        $customer = Customer::with(relations: ['laserTreatments', 'microneedlingTreatments'])->find($id);
+        $customer = Customer::with(['laserTreatments', 'microneedlingTreatments', 'appointments'])->find($id);
         $laserCategories = LaserCategory::all();
 
         return Inertia::render(component: 'customers/customer-show', props: [

@@ -1,5 +1,6 @@
 import { LaserTreatment } from './laser-treatment'
 import { MicroneedlingTreatment } from './microneedling-treatment'
+import { type Appointment } from '../pages/calendar/appointment-dialog'
 
 export type Customer = {
     id: number,
@@ -39,6 +40,7 @@ export type Customer = {
     frequent_solar_exposure: boolean
     laser_treatments: LaserTreatment[]
     microneedling_treatments: MicroneedlingTreatment[]
+    appointments: Appointment[]
 }
 
 export interface ExtendedCustomer extends Customer {

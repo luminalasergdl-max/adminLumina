@@ -4,10 +4,15 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { index } from '@/routes/customers';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { CircleUser, ChartNoAxesCombined, CreditCard, Tag, DollarSign } from 'lucide-react';
+import { CircleUser, ChartNoAxesCombined, CreditCard, Tag, DollarSign, Building2, Box, Calculator, Calendar } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
+    {
+        title: 'Calendario',
+        href: '/calendar',
+        icon: Calendar,
+    },
     {
         title: 'Clientes',
         href: '/customers',
@@ -23,6 +28,18 @@ const mainNavItems: NavItem[] = [
         href: '/finances',
         icon: DollarSign,
     },
+    /*
+    {
+        title: 'Proveedores',
+        href: '/suppliers',
+        icon: Building2,
+    },
+    {
+        title: 'Productos',
+        href: '/products',
+        icon: Box,
+    },
+    */
     {
         title: 'Tarjetas de regalo',
         href: '/gift_card',
@@ -32,6 +49,11 @@ const mainNavItems: NavItem[] = [
         title: 'Campañas',
         href: '/gift_card_campaign',
         icon: Tag,
+    },
+    {
+        title: 'Cotizador de tatuajes',
+        href: '/pricing-calculator',
+        icon: Calculator,
     },
 ];
 
