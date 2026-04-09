@@ -29,7 +29,18 @@ export default function Calendar() {
     const calendarRef = useRef<FullCalendar | null>(null);
 
     const handleDateClick = (info: any) => {
-        calendarRef.current?.getApi().changeView('timeGridWeek');
+        /*
+        setSelectedDate(info.dateStr);
+        setSelectedAppointment(null);
+        setIsDialogOpen(true);
+        */
+        if (calendarRef.current?.getApi().view.type === 'dayGridMonth') {
+            calendarRef.current?.getApi().changeView('timeGridWeek');
+        } else {
+            setSelectedDate(info.dateStr);
+            setSelectedAppointment(null);
+            setIsDialogOpen(true);
+        }
     };
 
     const handleEventClick = (info: any) => {
