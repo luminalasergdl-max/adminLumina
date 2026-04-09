@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -26,10 +26,10 @@ export default function Calendar() {
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
+    const calendarRef = useRef<FullCalendar | null>(null);
+
     const handleDateClick = (info: any) => {
-        setSelectedDate(info.dateStr);
-        setSelectedAppointment(null);
-        setIsDialogOpen(true);
+        calendarRef.current?.getApi().changeView('timeGridWeek');
     };
 
     const handleEventClick = (info: any) => {
@@ -109,6 +109,7 @@ export default function Calendar() {
             </div>
             <div className="px-4 pb-4">
                 <FullCalendar
+                    ref={calendarRef}
                     plugins={[interactionPlugin, dayGridPlugin, timeGridPlugin]}
                     initialView="dayGridMonth"
                     headerToolbar={{
