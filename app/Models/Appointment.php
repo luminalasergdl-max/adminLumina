@@ -22,6 +22,7 @@ class Appointment extends Model
         'google_calendar_event_id',
         'is_blocked',
         'whatsapp_reminder_sent',
+        'times_rescheduled',
     ];
 
     protected $casts = [
@@ -29,6 +30,7 @@ class Appointment extends Model
         'end_date' => 'date',
         'is_blocked' => 'boolean',
         'whatsapp_reminder_sent' => 'boolean',
+        'times_rescheduled' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

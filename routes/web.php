@@ -31,11 +31,11 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/', function () {
-        return redirect('/customers');
+        return redirect('/calendar');
     })->name('home');
 
     Route::get('dashboard', function () {
-        return redirect('/customers');
+        return redirect('/calendar');
     })->name('dashboard');
 
     Route::get('reports', [ReportsController::class, 'show']);

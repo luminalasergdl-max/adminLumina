@@ -17,6 +17,7 @@ CREATE TABLE `appointment` (
     `google_calendar_event_id` VARCHAR(255) NULL,
     `is_blocked` TINYINT(1) NOT NULL DEFAULT 0,
     `whatsapp_reminder_sent` TINYINT(1) NOT NULL DEFAULT 0,
+    `times_rescheduled` INT UNSIGNED NOT NULL DEFAULT 0,
     
     -- Auditoría
     `created_at` TIMESTAMP NULL,
