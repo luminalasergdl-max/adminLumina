@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 
-import { Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption } from '@headlessui/react';
-import { CheckIcon, ChevronsUpDownIcon, Trash2, MessageCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AppointmentShowView } from './appointment-show-view';
+import { AppointmentEditView } from './appointment-edit-view';
 
 export interface Customer {
     id: number;
@@ -22,6 +19,8 @@ export interface Appointment {
     end_time: string;
     is_blocked?: boolean;
     whatsapp_reminder_sent: boolean;
+    times_rescheduled?: number;
+    is_rescheduling?: boolean;
 }
 
 interface AppointmentDialogProps {
@@ -43,7 +42,7 @@ export function AppointmentDialog({
     onSave,
     onDelete,
 }: AppointmentDialogProps) {
-    const [viewMode, setViewMode] = useState<'show' | 'edit'>('show');
+    const [viewMode, setViewMode] = useState<'show' | 'edit' | 'reschedule'>('show');
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [query, setQuery] = useState('');
 
@@ -52,6 +51,7 @@ export function AppointmentDialog({
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [whatsappReminder, setWhatsappReminder] = useState(false);
+    const [timesRescheduled, setTimesRescheduled] = useState(0);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -63,6 +63,7 @@ export function AppointmentDialog({
                 setEndDate(appointment.end_date.split('T')[0]);
                 setStartTime(appointment.start_time);
                 setEndTime(appointment.end_time);
+                setTimesRescheduled(appointment.times_rescheduled || 0);
             } else {
                 setSelectedCustomer(null);
 
@@ -132,11 +133,13 @@ export function AppointmentDialog({
             start_time: startTime,
             end_time: endTime,
             whatsapp_reminder_sent: whatsappReminder,
+            times_rescheduled: timesRescheduled,
+            is_rescheduling: viewMode === 'reschedule',
         });
     };
 
     const isEditMode = !!appointment?.id;
-    const isFuture = new Date(`${startDate}T${startTime}`) > new Date();
+    const isFuture = new Date(`${endDate}T${endTime}`) > new Date();
     const canSendWhatsApp = isEditMode && isFuture && !!selectedCustomer?.contact_phone_1;
 
     const handleWhatsApp = () => {
@@ -146,157 +149,74 @@ export function AppointmentDialog({
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     };
 
+    const handleStartDateChange = (newStartDate: string) => {
+        setStartDate(newStartDate);
+        if (newStartDate > endDate || !endDate) {
+            setEndDate(newStartDate);
+        }
+    };
+
+    const handleStartTimeChange = (newStartTime: string) => {
+        setStartTime(newStartTime);
+        if (newStartTime) {
+            const [hours, minutes] = newStartTime.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hours, minutes, 0, 0);
+            date.setMinutes(date.getMinutes() + 60);
+
+            const endHours = String(date.getHours()).padStart(2, '0');
+            const endMinutes = String(date.getMinutes()).padStart(2, '0');
+            setEndTime(`${endHours}:${endMinutes}`);
+        }
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {viewMode === 'show' ? 'Detalles de la Reserva' : isEditMode ? 'Editar Reserva' : 'Nueva Reserva'}
+                        {viewMode === 'show' ? 'Detalles de la Reserva' : viewMode === 'reschedule' ? 'Reagendar Reserva' : isEditMode ? 'Editar Reserva' : 'Nueva Reserva'}
                     </DialogTitle>
                 </DialogHeader>
 
                 {viewMode === 'show' ? (
-                    <div className="py-4 grid gap-4">
-                        <div>
-                            <span className="text-sm font-medium text-muted-foreground">Cliente</span>
-                            <p className="font-medium text-lg">{selectedCustomer?.full_name || 'Sin asignar'}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <span className="text-sm font-medium text-muted-foreground">Fecha Inicio</span>
-                                <p>{startDate}</p>
-                            </div>
-                            <div>
-                                <span className="text-sm font-medium text-muted-foreground">Fecha Fin</span>
-                                <p>{endDate}</p>
-                            </div>
-                            <div>
-                                <span className="text-sm font-medium text-muted-foreground">Hora Inicio</span>
-                                <p>{startTime}</p>
-                            </div>
-                            <div>
-                                <span className="text-sm font-medium text-muted-foreground">Hora Fin</span>
-                                <p>{endTime}</p>
-                            </div>
-                        </div>
-                    </div>
+                    <AppointmentShowView
+                        selectedCustomer={selectedCustomer}
+                        startDate={startDate}
+                        endDate={endDate}
+                        startTime={startTime}
+                        endTime={endTime}
+                        timesRescheduled={timesRescheduled}
+                        canSendWhatsApp={canSendWhatsApp}
+                        handleWhatsApp={handleWhatsApp}
+                        setViewMode={setViewMode}
+                    />
                 ) : (
-                    <div className="py-4 grid gap-4">
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="customer">Cliente</Label>
-                            <Combobox value={selectedCustomer} onChange={setSelectedCustomer}>
-                                <div className="relative mt-1">
-                                    <div className="relative w-full cursor-default overflow-hidden rounded-md border border-input bg-background shadow-sm focus-within:ring-1 focus-within:ring-ring sm:text-sm">
-                                        <ComboboxInput
-                                            className="w-full border-none bg-transparent py-2 pl-3 pr-10 text-sm focus:outline-none focus:ring-0"
-                                            displayValue={(customer: Customer) => customer ? customer.full_name : ''}
-                                            onChange={(event) => setQuery(event.target.value)}
-                                            placeholder="Buscar cliente..."
-                                        />
-                                        <ComboboxButton className="absolute inset-y-0 right-0 flex items-center pr-2">
-                                            <ChevronsUpDownIcon className="h-4 w-4 text-muted-foreground opacity-50" aria-hidden="true" />
-                                        </ComboboxButton>
-                                    </div>
-                                    <ComboboxOptions className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover text-popover-foreground shadow-md sm:text-sm z-50">
-                                        {filteredCustomers.length === 0 && query !== '' ? (
-                                            <div className="relative cursor-default select-none py-2 px-4 text-muted-foreground">
-                                                No se encontraron clientes.
-                                            </div>
-                                        ) : (
-                                            filteredCustomers.map((customer) => (
-                                                <ComboboxOption
-                                                    key={customer.id}
-                                                    value={customer}
-                                                    className={({ focus }) =>
-                                                        `relative cursor-pointer select-none py-2 pl-8 pr-4 ${focus ? 'bg-accent text-accent-foreground' : 'text-foreground'
-                                                        }`
-                                                    }
-                                                >
-                                                    {({ selected }) => (
-                                                        <>
-                                                            <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                                                                {customer.full_name}
-                                                            </span>
-                                                            {selected ? (
-                                                                <span className="absolute inset-y-0 left-0 flex items-center pl-2 text-primary">
-                                                                    <CheckIcon className="h-4 w-4" aria-hidden="true" />
-                                                                </span>
-                                                            ) : null}
-                                                        </>
-                                                    )}
-                                                </ComboboxOption>
-                                            ))
-                                        )}
-                                    </ComboboxOptions>
-                                </div>
-                            </Combobox>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="start_date">Fecha Inicio</Label>
-                                <Input id="start_date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="end_date">Fecha Fin</Label>
-                                <Input id="end_date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="start_time">Hora Inicio</Label>
-                                <Input id="start_time" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="end_time">Hora Fin</Label>
-                                <Input id="end_time" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {error && (
-                    <div className="text-sm font-medium text-destructive mb-2 px-2">
-                        {error}
-                    </div>
-                )}
-
-                {viewMode === 'show' ? (
-                    <DialogFooter className="flex flex-col sm:flex-row sm:justify-between w-full gap-2 mt-4">
-                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                            {canSendWhatsApp && (
-                                <Button variant="outline" className="w-full sm:w-auto text-green-600 border-green-600 hover:bg-green-50" onClick={handleWhatsApp}>
-                                    <MessageCircle className="w-4 h-4 mr-2" />
-                                    WhatsApp
-                                </Button>
-                            )}
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto justify-end">
-                            <Button className="w-full sm:w-auto" onClick={() => setViewMode('edit')}>Editar/borrar</Button>
-                        </div>
-                    </DialogFooter>
-                ) : (
-                    <DialogFooter className="flex flex-col sm:flex-row sm:justify-between w-full gap-2 mt-4">
-                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                            {isEditMode && onDelete && (
-                                <Button variant="destructive" className="w-full sm:w-auto" onClick={() => appointment?.id && onDelete(appointment.id)}>
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Eliminar
-                                </Button>
-                            )}
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto justify-end">
-                            <Button variant="outline" className="w-full sm:w-auto" onClick={() => {
-                                if (appointment) {
-                                    setViewMode('show');
-                                } else {
-                                    onOpenChange(false);
-                                }
-                            }}>Cancelar</Button>
-                            <Button className="w-full sm:w-auto" onClick={handleSave}>Guardar</Button>
-                        </div>
-                    </DialogFooter>
+                    <AppointmentEditView
+                        viewMode={viewMode}
+                        isEditMode={isEditMode}
+                        appointment={appointment}
+                        selectedCustomer={selectedCustomer}
+                        setSelectedCustomer={setSelectedCustomer}
+                        filteredCustomers={filteredCustomers}
+                        query={query}
+                        setQuery={setQuery}
+                        startDate={startDate}
+                        handleStartDateChange={handleStartDateChange}
+                        endDate={endDate}
+                        setEndDate={setEndDate}
+                        startTime={startTime}
+                        handleStartTimeChange={handleStartTimeChange}
+                        endTime={endTime}
+                        setEndTime={setEndTime}
+                        timesRescheduled={timesRescheduled}
+                        setTimesRescheduled={setTimesRescheduled}
+                        error={error}
+                        handleSave={handleSave}
+                        onDelete={onDelete}
+                        setViewMode={setViewMode}
+                        onOpenChange={onOpenChange}
+                    />
                 )}
             </DialogContent>
         </Dialog>

@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
-import FullCalendar from '@fullcalendar/react'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
-import interactionPlugin from '@fullcalendar/interaction'
+import { useState, useRef, useEffect } from 'react';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import listPlugin from '@fullcalendar/list';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -11,6 +12,8 @@ import { usePage, router } from '@inertiajs/react';
 import { AppointmentDialog, type Customer, type Appointment } from './appointment-dialog';
 import { BlockedDatesDialog } from './blocked-dates-dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,15 +28,25 @@ export default function Calendar() {
     const [isBlockedDatesDialogOpen, setIsBlockedDatesDialogOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const calendarRef = useRef<FullCalendar | null>(null);
 
+    useEffect(() => {
+        if (!calendarRef.current) return;
+        const api = calendarRef.current.getApi();
+        if (searchQuery.trim().length > 0) {
+            if (api.view.type !== 'listMonth') {
+                api.changeView('listMonth');
+            }
+        } else {
+             if (api.view.type === 'listMonth') {
+                 api.changeView('dayGridMonth');
+             }
+        }
+    }, [searchQuery]);
+
     const handleDateClick = (info: any) => {
-        /*
-        setSelectedDate(info.dateStr);
-        setSelectedAppointment(null);
-        setIsDialogOpen(true);
-        */
         if (calendarRef.current?.getApi().view.type === 'dayGridMonth') {
             calendarRef.current?.getApi().changeView('timeGridWeek');
         } else {
@@ -61,7 +74,12 @@ export default function Calendar() {
     const handleSaveAppointment = (appointment: Appointment) => {
         if (appointment.id) {
             router.put(`/appointments/${appointment.id}`, appointment as any, {
-                onSuccess: () => setIsDialogOpen(false),
+                onSuccess: () => {
+                    setIsDialogOpen(false);
+                    if (appointment.is_rescheduling) {
+                        alert('¡Cita reagendada con éxito!');
+                    }
+                },
             });
         } else {
             router.post('/appointments', appointment as any, {
@@ -93,7 +111,24 @@ export default function Calendar() {
         }
     };
 
-    const calendarEvents = appointments?.map(appointment => {
+    const filteredAppointments = appointments?.filter(appointment => {
+        if (!searchQuery) return true;
+        
+        const q = searchQuery.toLowerCase();
+        const customer = (appointment as any).customer;
+        
+        if (customer) {
+            if (customer.full_name?.toLowerCase().includes(q)) return true;
+            if (customer.contact_phone_1?.includes(q)) return true;
+            if (customer.contact_phone_2?.includes(q)) return true;
+        }
+        
+        if (appointment.is_blocked && 'bloqueado'.includes(q)) return true;
+
+        return false;
+    }) || [];
+
+    const calendarEvents = filteredAppointments.map(appointment => {
         const isBlocked = appointment.is_blocked;
 
         const customerName = (appointment as any).customer?.full_name || 'Sin Asignar';
@@ -111,7 +146,13 @@ export default function Calendar() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <div className="p-4 flex justify-end">
+            <div className="p-4 flex justify-end gap-16 sm:gap-2">
+                <Input
+                    placeholder="Buscar cliente por nombre o número teléfonico..."
+                    className="max-w"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
                 <Button variant="secondary" onClick={() => {
                     setSelectedDate(new Date().toISOString().split('T')[0]);
                     setSelectedAppointment(null);
@@ -121,17 +162,18 @@ export default function Calendar() {
             <div className="px-4 pb-4">
                 <FullCalendar
                     ref={calendarRef}
-                    plugins={[interactionPlugin, dayGridPlugin, timeGridPlugin]}
+                    plugins={[interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin]}
                     initialView="dayGridMonth"
                     headerToolbar={{
                         left: 'prev,next today',
                         center: 'title',
-                        right: 'dayGridMonth,timeGridWeek',
+                        right: 'dayGridMonth,timeGridWeek,listMonth',
                     }}
                     buttonText={{
                         today: 'Hoy',
                         month: 'Mes',
                         week: 'Semana',
+                        list: 'Lista',
                     }}
                     locale="es"
                     height={"60vh"}

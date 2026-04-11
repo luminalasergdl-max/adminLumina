@@ -54,6 +54,13 @@ export function CustomerShowAppointmentsTable({ customer }: CustomerShowAppointm
             accessorKey: "end_time",
             header: "Hora Fin",
         },
+        {
+            accessorKey: "times_rescheduled",
+            header: "Veces reagendado",
+            cell: ({row}) => {
+                return row.original.times_rescheduled ?? 0;
+            }
+        },
     ]
 
     const data = customer.appointments || [];

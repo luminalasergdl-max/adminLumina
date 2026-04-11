@@ -13,8 +13,8 @@ class AppointmentController extends Controller
      */
     public function index(Request $request)
     {
-        $appointments = Appointment::with('customer:id,full_name,contact_phone_1')->get();
-        $customers = \App\Models\Customer::orderBy('full_name')->get(['id', 'full_name', 'contact_phone_1']);
+        $appointments = Appointment::with('customer:id,full_name,contact_phone_1,contact_phone_2')->get();
+        $customers = \App\Models\Customer::orderBy('full_name')->get(['id', 'full_name', 'contact_phone_1', 'contact_phone_2']);
 
         if ($request->wantsJson()) {
             return response()->json($appointments);
@@ -84,10 +84,18 @@ class AppointmentController extends Controller
             'google_calendar_event_id' => ['nullable', 'string', 'max:255'],
             'is_blocked' => ['boolean'],
             'whatsapp_reminder_sent' => ['boolean'],
+            'times_rescheduled' => ['nullable', 'integer', 'min:0'],
+            'is_rescheduling' => ['nullable', 'boolean'],
         ]);
 
         $appointment = Appointment::findOrFail($id);
-        $appointment->update($request->all());
+        $appointment->fill($request->all());
+
+        if ($request->boolean('is_rescheduling')) {
+            $appointment->times_rescheduled += 1;
+        }
+
+        $appointment->save();
 
         if ($request->wantsJson() || $request->headers->get('X-Inertia')) {
             return back();
