@@ -79,7 +79,7 @@ class FinanceExport implements WithMultipleSheets
         $grouped = $items->filter(fn($item) => $item['date'] !== null)
             ->groupBy(function ($item) {
                 return $item['date']->format('Y-m');
-            })->sortKeysDesc();
+            })->sortKeys();
 
         $sheets = [];
         foreach ($grouped as $month => $monthItems) {
