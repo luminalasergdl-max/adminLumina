@@ -72,12 +72,13 @@ class CustomerSheet implements FromCollection, WithTitle
             $data[] = ['']; // Spacer
             $data[] = ['DATOS DEL TRATAMIENTO LÁSER'];
             $data[] = [
-                '', 'ID del Tratamiento', 'Descripción breve', 'Lugar anatómico', 'Tamaño', 'Antigüedad (años)', 
+                '', 'ID del Tratamiento', 'Categoría', 'Descripción breve', 'Lugar anatómico', 'Tamaño', 'Antigüedad (años)', 
                 'Número de retoques', 'Láser', 'Cirugía', 'Ácido', 'Otro', 'Terminado', 'Notas'
             ];
             $data[] = [
                 '',
                 $treatment->id,
+                $treatment->category->name ?? 'N/A',
                 $treatment->brief_description,
                 $treatment->anatomic_place,
                 $treatment->size,
@@ -90,6 +91,24 @@ class CustomerSheet implements FromCollection, WithTitle
                 $treatment->finished ? 'Sí' : 'No',
                 $treatment->notes,
             ];
+
+            if ($treatment->packages->count() > 0) {
+                $data[] = ['', 'PAQUETES CONTRATADOS'];
+                $data[] = [
+                    '', 'ID Paquete', 'Nombre Paquete', 'Precio', 'Sesiones Totales', 'Sesiones Usadas', 'Notas'
+                ];
+                foreach ($treatment->packages as $package) {
+                    $data[] = [
+                        '',
+                        $package->id,
+                        $package->package_name,
+                        $package->package_price,
+                        $package->package_sessions_total,
+                        $package->package_sessions_used,
+                        $package->notes,
+                    ];
+                }
+            }
 
             if ($treatment->laserSessions->count() > 0) {
                 $data[] = ['', '', 'SESIONES LÁSER'];
@@ -107,6 +126,46 @@ class CustomerSheet implements FromCollection, WithTitle
                         $session->passes,
                         $session->price,
                         $session->package_id,
+                        $session->notes,
+                    ];
+                }
+            }
+        }
+
+        foreach ($this->customer->microneedlingTreatments as $treatment) {
+            $data[] = ['']; // Spacer
+            $data[] = ['DATOS DEL TRATAMIENTO MICRONEEDLING'];
+            $data[] = [
+                '', 'ID del Tratamiento', 'Objetivo', 'Lugar anatómico', 'Sesiones Previas', 
+                'Láser', 'Cirugía', 'Ácido', 'Otro', 'Notas'
+            ];
+            $data[] = [
+                '',
+                $treatment->id,
+                $treatment->objective,
+                $treatment->anatomic_place,
+                $treatment->previous_sessions,
+                $treatment->laser ? 'Sí' : 'No',
+                $treatment->surgery ? 'Sí' : 'No',
+                $treatment->acid ? 'Sí' : 'No',
+                $treatment->other,
+                $treatment->notes,
+            ];
+
+            if ($treatment->microneedlingSessions->count() > 0) {
+                $data[] = ['', '', 'SESIONES MICRONEEDLING'];
+                $data[] = [
+                    '', '', 'ID de la Sesión', 'Fecha y hora', 'Activo', 'Agujas', 'Precio', 'Notas'
+                ];
+                foreach ($treatment->microneedlingSessions as $session) {
+                    $data[] = [
+                        '', 
+                        '',
+                        $session->id,
+                        $session->date_hour ? $session->date_hour->format('Y-m-d H:i') : '',
+                        $session->activo,
+                        $session->agujas,
+                        $session->price,
                         $session->notes,
                     ];
                 }
