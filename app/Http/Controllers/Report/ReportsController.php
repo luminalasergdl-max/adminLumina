@@ -57,13 +57,9 @@ class ReportsController extends Controller
             ->whereRaw('YEAR(date_hour) = ?', [$year])
             ->count();
 
-        Log::info('laserSessionsByPeriod: ' . $month . ' ' . $year);
-
         $microneedlingSessionsTotal = MicroneedlingSession::whereRaw('MONTH(date_hour) = ?', [$month])
             ->whereRaw('YEAR(date_hour) = ?', [$year])
             ->count();
-
-        Log::info('laserSessionsByPeriod: ' . $month . ' ' . $year);
 
         return $laserSessionsTotal + $microneedlingSessionsTotal;
     }
