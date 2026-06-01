@@ -8,6 +8,7 @@ import { CustomersByZipCode } from './customers-by-zip-code';
 import { CustomersByHowDidYouKnownAboutUs } from './customers-by-how-did-you-known-about-us';
 import { NewCustomersByPeriod } from './new-customers-by-period';
 import { LaserTreatmentByLaserCategory } from './laser-treatment-by-laser-category';
+import { SessionsByPeriod } from './sessions-by-period';
 
 import { GenderTotal, ZipCodeTotal, HowDidYouKnowAboutUsTotal, LaserTreatmentByLaserCategoryTotal } from '@/types/reports';
 
@@ -24,9 +25,10 @@ type ReportsProps = {
     customersByHowDidYouKnownAboutUs: HowDidYouKnowAboutUsTotal[]
     newCustomersByPeriod: number
     laserTreatmentsByLaserCategory: LaserTreatmentByLaserCategoryTotal[]
+    sessionsByPeriod: number
 }
 
-export default function Reports({ customersByGender, customersByZipCode, customersByHowDidYouKnownAboutUs, newCustomersByPeriod, laserTreatmentsByLaserCategory }: ReportsProps) {
+export default function Reports({ customersByGender, customersByZipCode, customersByHowDidYouKnownAboutUs, newCustomersByPeriod, laserTreatmentsByLaserCategory, sessionsByPeriod }: ReportsProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Reportes" />
@@ -37,6 +39,7 @@ export default function Reports({ customersByGender, customersByZipCode, custome
                     <CustomersByZipCode customersByZipCode={customersByZipCode} />
                     <LaserTreatmentByLaserCategory laserTreatmentsByLaserCategory={laserTreatmentsByLaserCategory} />
                     <NewCustomersByPeriod newCustomersByPeriod={newCustomersByPeriod} />
+                    <SessionsByPeriod sessionsByPeriod={sessionsByPeriod} />
                 </div>
             </div>
         </AppLayout>

@@ -7,12 +7,17 @@ use App\Http\Controllers\Controller;
 use App\Models\GiftCard;
 use Inertia\Inertia;
 
+use App\Models\Appointment;
 use App\Models\Customer;
 
 use App\Models\LaserSession;
 use App\Models\MicroneedlingSession;
 use App\Models\Package;
 use App\Models\LaserTreatment;
+
+
+use Illuminate\Support\Facades\Log;
+
 
 use DB;
 
@@ -32,7 +37,8 @@ class ReportsController extends Controller
             'customersByZipCode' => $customersByZipCode,
             'newCustomersByPeriod' => self::newCustomersByPeriod($currentMonth, $currentYear),
             'customersByHowDidYouKnownAboutUs' => self::getCustomersByHowDidYouKnownAboutUs(),
-            'laserTreatmentsByLaserCategory' => self::laserTreatmentsByLaserCategory()
+            'laserTreatmentsByLaserCategory' => self::laserTreatmentsByLaserCategory(),
+            'sessionsByPeriod' => self::sessionsByPeriod($currentMonth, $currentYear)
         ]);
     }
 
@@ -43,6 +49,19 @@ class ReportsController extends Controller
             ->count();
 
         return $total;
+    }
+
+    public function sessionsByPeriod($month, $year)
+    {
+        $laserSessionsTotal = LaserSession::whereRaw('MONTH(date_hour) = ?', [$month])
+            ->whereRaw('YEAR(date_hour) = ?', [$year])
+            ->count();
+
+        $microneedlingSessionsTotal = MicroneedlingSession::whereRaw('MONTH(date_hour) = ?', [$month])
+            ->whereRaw('YEAR(date_hour) = ?', [$year])
+            ->count();
+
+        return $laserSessionsTotal + $microneedlingSessionsTotal;
     }
 
     public static function getCustomersByHowDidYouKnownAboutUs()
@@ -80,9 +99,9 @@ class ReportsController extends Controller
             DB::raw("COALESCE(laser_category.name, 'Sin Categoría') AS laser_category_name"),
             DB::raw('COUNT(laser_treatment.id) AS total')
         )
-        ->leftJoin('laser_category', 'laser_treatment.laser_category_id', '=', 'laser_category.id')
-        ->groupBy('laser_category.name')
-        ->get();
+            ->leftJoin('laser_category', 'laser_treatment.laser_category_id', '=', 'laser_category.id')
+            ->groupBy('laser_category.name')
+            ->get();
 
         return $laserTreatmentsByLaserCategory;
     }

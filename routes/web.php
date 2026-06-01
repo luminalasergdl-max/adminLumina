@@ -44,6 +44,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('newCustomersByPeriod/{month}/{year}', [ReportsController::class, 'newCustomersByPeriod']);
 
+    Route::get('sessionsByPeriod/{month}/{year}', [ReportsController::class, 'sessionsByPeriod']);
+
     Route::resource('customers', CustomerController::class);
 
     Route::resource('customers.laser_treatments', LaserTreatmentController::class);
