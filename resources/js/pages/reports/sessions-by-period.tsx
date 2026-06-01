@@ -55,7 +55,7 @@ export function SessionsByPeriod({ sessionsByPeriod }: SessionsByPeriodProps) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Citas por Periodo</CardTitle>
+                <CardTitle>Sesiones por Periodo</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
                 <div className="flex gap-4">
