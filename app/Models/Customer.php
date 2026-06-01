@@ -48,9 +48,6 @@ class Customer extends Model
 
     protected $casts = [
         'birthdate' => 'date',
-        'instagram' => 'boolean',
-        'maps' => 'boolean',
-        'mouth_mouth' => 'boolean',
         'diabetes' => 'boolean',
         'hipertension' => 'boolean',
         'epilepsia' => 'boolean',
