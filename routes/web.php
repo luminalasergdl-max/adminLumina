@@ -24,6 +24,8 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AppointmentController;
 
+use Laravel\Socialite\Socialite;
+
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
@@ -83,6 +85,46 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('pricing-calculator');
 
     Route::get('calendar', [AppointmentController::class, 'index'])->name('index');
+});
+
+//Google Calendar OAuth
+Route::get('/auth/redirect', function () {
+    return Socialite::driver('google')
+        ->scopes(['https://www.googleapis.com/auth/calendar'])
+        ->with([
+            'prompt' => 'consent',
+        ])
+        ->redirect();
+});
+
+Route::get('/auth/callback', function () {
+    $googleUser = Socialite::driver('google')->user();
+
+    Storage::disk('local')->put('google/oauth-token.json', $googleUser->token);
+    if ($googleUser->refreshToken) {
+        Storage::disk('local')->put('google/oauth-refresh-token.json', $googleUser->refreshToken);
+    }
+
+    $expiresIn = $googleUser->expiresIn;
+
+    //Auth::login($user);
+    return redirect('/calendar');
+});
+
+Route::get('/auth/refresh', function () {
+    $refreshToken = Storage::disk('local')->get('google/oauth-refresh-token.json');
+
+    $newTokens = Socialite::driver('google')->refreshToken($refreshToken);
+
+    if ($newTokens->token) {
+        Storage::disk('local')->put('google/oauth-token.json', $newTokens->token);
+    }
+
+    if ($newTokens->refreshToken) {
+        Storage::disk('local')->put('google/oauth-refresh-token.json', $newTokens->refreshToken);
+    }
+
+    return redirect('/gmail');
 });
 
 require __DIR__ . '/settings.php';

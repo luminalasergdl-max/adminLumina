@@ -13,7 +13,6 @@ import { AppointmentDialog, type Customer, type Appointment } from './appointmen
 import { BlockedDatesDialog } from './blocked-dates-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -40,9 +39,9 @@ export default function Calendar() {
                 api.changeView('listMonth');
             }
         } else {
-             if (api.view.type === 'listMonth') {
-                 api.changeView('dayGridMonth');
-             }
+            if (api.view.type === 'listMonth') {
+                api.changeView('dayGridMonth');
+            }
         }
     }, [searchQuery]);
 
@@ -113,16 +112,16 @@ export default function Calendar() {
 
     const filteredAppointments = appointments?.filter(appointment => {
         if (!searchQuery) return true;
-        
+
         const q = searchQuery.toLowerCase();
         const customer = (appointment as any).customer;
-        
+
         if (customer) {
             if (customer.full_name?.toLowerCase().includes(q)) return true;
             if (customer.contact_phone_1?.includes(q)) return true;
             if (customer.contact_phone_2?.includes(q)) return true;
         }
-        
+
         if (appointment.is_blocked && 'bloqueado'.includes(q)) return true;
 
         return false;

@@ -6,6 +6,8 @@ use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+use Spatie\GoogleCalendar\Event;
+
 class AppointmentController extends Controller
 {
     /**
@@ -13,6 +15,13 @@ class AppointmentController extends Controller
      */
     public function index(Request $request)
     {
+
+        $events = Event::get();
+        foreach ($events as $event) {
+            //\Illuminate\Support\Facades\Log::info($event->id, ['start' => $event->name, 'end' => $event->summary]);
+        }
+
+
         $appointments = Appointment::with('customer:id,full_name,contact_phone_1,contact_phone_2')->get();
         $customers = \App\Models\Customer::orderBy('full_name')->get(['id', 'full_name', 'contact_phone_1', 'contact_phone_2']);
 
