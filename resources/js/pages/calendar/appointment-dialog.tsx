@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { AppointmentShowView } from './appointment-show-view';
+import { getWhatsAppUrl } from '@/lib/whatsapp';
 import { AppointmentEditView } from './appointment-edit-view';
+import { AppointmentShowView } from './appointment-show-view';
 
 export interface Customer {
     id: number;
@@ -33,15 +34,7 @@ interface AppointmentDialogProps {
     onDelete?: (id: number) => void;
 }
 
-export function AppointmentDialog({
-    isOpen,
-    onOpenChange,
-    appointment,
-    customers,
-    selectedDate,
-    onSave,
-    onDelete,
-}: AppointmentDialogProps) {
+export function AppointmentDialog({ isOpen, onOpenChange, appointment, customers, selectedDate, onSave, onDelete }: AppointmentDialogProps) {
     const [viewMode, setViewMode] = useState<'show' | 'edit' | 'reschedule'>('show');
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [query, setQuery] = useState('');
@@ -57,7 +50,7 @@ export function AppointmentDialog({
     useEffect(() => {
         if (isOpen) {
             if (appointment) {
-                const customer = customers.find(c => c.id === appointment.customer_id) || null;
+                const customer = customers.find((c) => c.id === appointment.customer_id) || null;
                 setSelectedCustomer(customer);
                 setStartDate(appointment.start_date.split('T')[0]);
                 setEndDate(appointment.end_date.split('T')[0]);
@@ -106,8 +99,8 @@ export function AppointmentDialog({
         query === ''
             ? customers
             : customers?.filter((customer) => {
-                return customer.full_name?.toLowerCase().includes(query.toLowerCase())
-            }) || [];
+                  return customer.full_name?.toLowerCase().includes(query.toLowerCase());
+              }) || [];
 
     const handleSave = () => {
         setError(null);
@@ -140,13 +133,16 @@ export function AppointmentDialog({
 
     const isEditMode = !!appointment?.id;
     const isFuture = new Date(`${endDate}T${endTime}`) > new Date();
-    const canSendWhatsApp = isEditMode && isFuture && !!selectedCustomer?.contact_phone_1;
+    const canSendWhatsApp = isEditMode && isFuture && !!getWhatsAppUrl(selectedCustomer?.contact_phone_1);
 
     const handleWhatsApp = () => {
         if (!selectedCustomer?.contact_phone_1) return;
         const msg = `Hola! te recordamos que tienes una cita pendiente el día ${startDate} a las ${startTime}`;
-        const phone = selectedCustomer.contact_phone_1.replace(/\D/g, '');
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        const whatsappUrl = getWhatsAppUrl(selectedCustomer.contact_phone_1, msg);
+
+        if (whatsappUrl) {
+            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        }
     };
 
     const handleStartDateChange = (newStartDate: string) => {
@@ -175,7 +171,13 @@ export function AppointmentDialog({
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>
-                        {viewMode === 'show' ? 'Detalles de la Reserva' : viewMode === 'reschedule' ? 'Reagendar Reserva' : isEditMode ? 'Editar Reserva' : 'Nueva Reserva'}
+                        {viewMode === 'show'
+                            ? 'Detalles de la Reserva'
+                            : viewMode === 'reschedule'
+                              ? 'Reagendar Reserva'
+                              : isEditMode
+                                ? 'Editar Reserva'
+                                : 'Nueva Reserva'}
                     </DialogTitle>
                 </DialogHeader>
 

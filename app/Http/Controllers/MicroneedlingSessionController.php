@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use Inertia\Inertia;
-
 use App\Models\Customer;
 use App\Models\MicroneedlingSession;
 use App\Models\MicroneedlingTreatment;
-
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class MicroneedlingSessionController extends Controller
 {
@@ -23,7 +19,7 @@ class MicroneedlingSessionController extends Controller
     {
         return Inertia::render('microneedling-sessions/microneedling-session-form', [
             'customer' => $customer,
-            'microneedling_treatment' => $microneedlingTreatment
+            'microneedling_treatment' => $microneedlingTreatment,
         ]);
     }
 
@@ -32,7 +28,12 @@ class MicroneedlingSessionController extends Controller
      */
     public function store(Customer $customer, MicroneedlingTreatment $microneedlingTreatment, Request $request)
     {
-        $microneedlingSession = new MicroneedlingSession();
+        $request->validate([
+            'price' => ['required', 'integer', 'min:0'],
+            'date_hour' => ['required', 'date'],
+        ]);
+
+        $microneedlingSession = new MicroneedlingSession;
         $microneedlingSession->fill($request->input());
 
         if ($request->hasFile('photo')) {
@@ -51,7 +52,6 @@ class MicroneedlingSessionController extends Controller
         }
 
         $microneedlingTreatment->microneedlingSessions()->save($microneedlingSession);
-
 
         return to_route('customers.microneedling_treatments.microneedling_sessions.show', parameters: [$customer, $microneedlingTreatment, $microneedlingSession]);
     }
@@ -79,7 +79,7 @@ class MicroneedlingSessionController extends Controller
         return Inertia::render('microneedling-sessions/microneedling-session-form', [
             'customer' => $customer,
             'microneedling_treatment' => $microneedlingTreatment,
-            'microneedling_session' => $microneedlingSession
+            'microneedling_session' => $microneedlingSession,
         ]);
     }
 
@@ -88,6 +88,11 @@ class MicroneedlingSessionController extends Controller
      */
     public function update(Customer $customer, MicroneedlingTreatment $microneedlingTreatment, MicroneedlingSession $microneedlingSession, Request $request)
     {
+        $request->validate([
+            'price' => ['required', 'integer', 'min:0'],
+            'date_hour' => ['required', 'date'],
+        ]);
+
         $microneedlingSession = MicroneedlingSession::findOrFail($microneedlingSession->id);
         $microneedlingSession->update($request->all());
 
@@ -110,6 +115,7 @@ class MicroneedlingSessionController extends Controller
         }
 
         $microneedlingTreatment->delete();
+
         return to_route('customers.show', [$customer]);
     }
 }
