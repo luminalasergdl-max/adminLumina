@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use Inertia\Inertia;
-
 use App\Models\Customer;
 use App\Models\LaserCategory;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CustomerController extends Controller
 {
@@ -46,10 +44,14 @@ class CustomerController extends Controller
     {
         $request->validate([
             'full_name' => ['required', 'string', 'max:255'],
-            'contact_phone_1' => ['required'],
+            'contact_phone_1' => $this->phoneRules(required: true),
+            'contact_phone_2' => $this->phoneRules(),
+            'emergency_contact_phone' => $this->phoneRules(),
+        ], [
+            'contact_phone_1.required' => 'El teléfono de contacto es obligatorio.',
         ]);
 
-        $customer = new Customer();
+        $customer = new Customer;
         $customer->fill($request->all());
         $customer->save();
 
@@ -66,7 +68,7 @@ class CustomerController extends Controller
 
         return Inertia::render(component: 'customers/customer-show', props: [
             'customer' => $customer,
-            'laser_categories' => $laserCategories
+            'laser_categories' => $laserCategories,
         ]);
     }
 
@@ -78,7 +80,7 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
 
         return Inertia::render('customers/customer-form', [
-            'customer' => $customer
+            'customer' => $customer,
         ]);
     }
 
@@ -89,7 +91,11 @@ class CustomerController extends Controller
     {
         $request->validate([
             'full_name' => ['required', 'string', 'max:255'],
-            'contact_phone_1' => ['required'],
+            'contact_phone_1' => $this->phoneRules(required: true),
+            'contact_phone_2' => $this->phoneRules(),
+            'emergency_contact_phone' => $this->phoneRules(),
+        ], [
+            'contact_phone_1.required' => 'El teléfono de contacto es obligatorio.',
         ]);
 
         $customer = Customer::findOrFail($id);
@@ -109,5 +115,21 @@ class CustomerController extends Controller
         $customer->delete();
 
         return to_route('customers.index');
+    }
+
+    private function phoneRules(bool $required = false): array
+    {
+        return [
+            $required ? 'required' : 'nullable',
+            'string',
+            'max:50',
+            function (string $attribute, mixed $value, \Closure $fail) {
+                $digitCount = strlen(preg_replace('/\D/', '', (string) $value));
+
+                if ($digitCount < 10 || $digitCount > 15) {
+                    $fail('El teléfono debe contener entre 10 y 15 dígitos.');
+                }
+            },
+        ];
     }
 }

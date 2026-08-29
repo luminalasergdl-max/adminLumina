@@ -1,39 +1,20 @@
 import AppLayout from '@/layouts/app-layout';
-import { index, create } from '@/routes/customers';
+import { create, index } from '@/routes/customers';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
-import { router } from '@inertiajs/react'
+import { router } from '@inertiajs/react';
 
-import {
-    Input
-} from "@/components/ui/input"
+import { Input } from '@/components/ui/input';
 
-import {
-    Button
-} from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-import {
-    ColumnDef,
-    flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    useReactTable,
-} from "@tanstack/react-table"
+import { ColumnDef, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table';
 
-import {
-    ExtendedCustomer
-} from '@/types/customer'
+import { getWhatsAppUrl } from '@/lib/whatsapp';
+import { ExtendedCustomer } from '@/types/customer';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,23 +25,29 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export const columns: ColumnDef<ExtendedCustomer>[] = [
     {
-        accessorKey: "full_name",
-        header: "Nombre",
+        accessorKey: 'full_name',
+        header: 'Nombre',
     },
     {
-        accessorKey: "email",
-        header: "Email",
+        accessorKey: 'email',
+        header: 'Email',
     },
     {
-        accessorKey: "contact_phone_1",
-        header: "Telefóno de Contacto",
-        cell: ({ row }) => (
-            <a href={`https://wa.me/${row.original.contact_phone_1}`} target='blank' rel="noopener" >
-                {row.original.contact_phone_1}
-            </a>
-        )
+        accessorKey: 'contact_phone_1',
+        header: 'Telefóno de Contacto',
+        cell: ({ row }) => {
+            const whatsappUrl = getWhatsAppUrl(row.original.contact_phone_1);
+
+            return whatsappUrl ? (
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()}>
+                    {row.original.contact_phone_1}
+                </a>
+            ) : (
+                row.original.contact_phone_1 || '-'
+            );
+        },
     },
-]
+];
 
 export default function CustomersList({ customers }: { customers: ExtendedCustomer[] }) {
     const table = useReactTable({
@@ -69,7 +56,7 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-    })
+    });
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -86,7 +73,7 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
                         href={create().url}
                         method={create().method}
                         as="button"
-                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3"
+                        className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground transition-all outline-none hover:bg-primary/90 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
                     >
                         Nuevo Cliente
                     </Link>
@@ -99,14 +86,9 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
                                     {headerGroup.headers.map((header) => {
                                         return (
                                             <TableHead key={header.id}>
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext()
-                                                    )}
+                                                {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                                             </TableHead>
-                                        )
+                                        );
                                     })}
                                 </TableRow>
                             ))}
@@ -115,10 +97,10 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
                             {table.getRowModel().rows?.length ? (
                                 table.getRowModel().rows.map((row) => (
                                     <TableRow
-                                        className={"cursor-pointer"}
+                                        className={'cursor-pointer'}
                                         key={row.id}
                                         onClick={() => {
-                                            router.get(`/customers/${row.original.id}`)
+                                            router.get(`/customers/${row.original.id}`);
                                         }}
                                     >
                                         {row.getVisibleCells().map((cell) => (
@@ -131,9 +113,7 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
                             ) : (
                                 <TableRow>
                                     <TableCell colSpan={columns.length} className="h-24 text-center">
-                                        <span className='font-bold text-2xl'>
-                                            Sin resultados.
-                                        </span>
+                                        <span className="text-2xl font-bold">Sin resultados.</span>
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -141,20 +121,10 @@ export default function CustomersList({ customers }: { customers: ExtendedCustom
                     </Table>
                 </div>
                 <div className="flex items-center justify-end space-x-2 py-4">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                         Anterior
                     </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
                         Siguiente
                     </Button>
                 </div>

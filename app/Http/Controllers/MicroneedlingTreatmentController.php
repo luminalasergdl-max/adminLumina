@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use Inertia\Inertia;
-
 use App\Models\Customer;
+use App\Models\MicroneedlingSession;
 use App\Models\MicroneedlingTreatment;
-
-use Illuminate\Support\Facades\File;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
+use Inertia\Inertia;
+use Throwable;
 
 class MicroneedlingTreatmentController extends Controller
 {
@@ -21,7 +19,7 @@ class MicroneedlingTreatmentController extends Controller
     public function create(Customer $customer, Request $request)
     {
         return Inertia::render('microneedling-treatments/microneedling-treatment-form', [
-            'customer' => $customer
+            'customer' => $customer,
         ]);
     }
 
@@ -30,29 +28,51 @@ class MicroneedlingTreatmentController extends Controller
      */
     public function store(Customer $customer, Request $request)
     {
-        $request->validate([
-            'objective' => 'required',
+        $validated = $request->validate([
+            'objective' => ['required'],
+            'initial_session_price' => ['required', 'integer', 'min:0'],
+            'initial_session_date_hour' => ['required', 'date'],
         ]);
 
-        $microneedlingTreatment = new MicroneedlingTreatment();
-        $microneedlingTreatment->fill($request->input());
+        $storedPhotoPaths = [];
 
-        if ($request->hasFile('photo')) {
-            $uploadPath = "uploads/customers/customer_{$customer->id}";
+        try {
+            $microneedlingTreatment = DB::transaction(function () use ($customer, $request, $validated, &$storedPhotoPaths) {
+                $microneedlingTreatment = new MicroneedlingTreatment;
+                $microneedlingTreatment->fill($request->except([
+                    'initial_session_price',
+                    'initial_session_date_hour',
+                    'photo',
+                ]));
 
-            File::ensureDirectoryExists($uploadPath);
+                if ($request->hasFile('photo')) {
+                    $uploadPath = "uploads/customers/customer_{$customer->id}";
 
-            foreach (range(0, 2) as $index) {
-                $photoField = "photo_{$index}";
-                if (isset($request->file('photo')[$index])) {
-                    $file = $request->file('photo')[$index];
-                    $path = $file->store($uploadPath, 'public');
-                    $microneedlingTreatment->$photoField = $path;
+                    foreach (range(0, 2) as $index) {
+                        $photoField = "photo_{$index}";
+                        if (isset($request->file('photo')[$index])) {
+                            $path = $request->file('photo')[$index]->store($uploadPath, 'public');
+                            $storedPhotoPaths[] = $path;
+                            $microneedlingTreatment->$photoField = $path;
+                        }
+                    }
                 }
-            }
-        }
 
-        $customer->microneedlingTreatments()->save($microneedlingTreatment);
+                $customer->microneedlingTreatments()->save($microneedlingTreatment);
+
+                $microneedlingSession = new MicroneedlingSession([
+                    'price' => $validated['initial_session_price'],
+                    'date_hour' => $validated['initial_session_date_hour'],
+                ]);
+                $microneedlingTreatment->microneedlingSessions()->save($microneedlingSession);
+
+                return $microneedlingTreatment;
+            });
+        } catch (Throwable $exception) {
+            Storage::disk('public')->delete($storedPhotoPaths);
+
+            throw $exception;
+        }
 
         return to_route('customers.microneedling_treatments.show', parameters: [$customer, $microneedlingTreatment]);
 
@@ -63,7 +83,7 @@ class MicroneedlingTreatmentController extends Controller
      */
     public function show(Customer $customer, MicroneedlingTreatment $microneedlingTreatment)
     {
-        $fullMicroneedlingTreatment = $microneedlingTreatment::with(relations:'microneedlingSessions')->find($microneedlingTreatment->id);
+        $fullMicroneedlingTreatment = $microneedlingTreatment::with(relations: 'microneedlingSessions')->find($microneedlingTreatment->id);
 
         return Inertia::render(component: 'microneedling-treatments/microneedling-treatment-show', props: [
             'customer' => $customer,
@@ -117,6 +137,7 @@ class MicroneedlingTreatmentController extends Controller
         }
 
         $microneedlingTreatment->delete();
+
         return to_route('customers.show', [$customer]);
     }
 }
